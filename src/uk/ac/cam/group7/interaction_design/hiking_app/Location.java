@@ -5,6 +5,7 @@ package uk.ac.cam.group7.interaction_design.hiking_app;
  *  2 ints for Lat and Long (final)
  *  String for name (possibly NULL)
  *  boolean for favourite
+ *  @author dobrik
  */
 public class Location {
     private final int latitude, longtitude;
@@ -137,5 +138,12 @@ public class Location {
         if(name!=null)return name;
         return "("+latitude+","+longtitude+")";
     }
+    //public static void main(String args[]){
+    //    Location test=new Location(11,22,"haway");
+    //    System.out.println(test);
+    //    test.setFavourite(true);
+    //    System.out.println(test.isFavourite());
+    //}
+
 }
 
