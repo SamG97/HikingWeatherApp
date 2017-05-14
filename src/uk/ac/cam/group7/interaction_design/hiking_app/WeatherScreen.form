@@ -10,7 +10,7 @@
     </properties>
     <border type="none"/>
     <children>
-      <component id="ea989" class="javax.swing.JLabel" binding="Sunrise">
+      <component id="ea989" class="javax.swing.JLabel" binding="sunrise">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -18,7 +18,7 @@
           <text value="Sunrise:"/>
         </properties>
       </component>
-      <component id="696cb" class="javax.swing.JLabel" binding="Sunset">
+      <component id="696cb" class="javax.swing.JLabel" binding="sunset">
         <constraints>
           <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -34,28 +34,12 @@
           <text value="Back"/>
         </properties>
       </component>
-      <component id="27102" class="javax.swing.JButton" default-binding="true">
-        <constraints>
-          <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Mon"/>
-        </properties>
-      </component>
-      <component id="88223" class="javax.swing.JLabel" binding="Location">
+      <component id="88223" class="javax.swing.JLabel" binding="location">
         <constraints>
           <grid row="0" column="1" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Ackyy"/>
-        </properties>
-      </component>
-      <component id="97352" class="javax.swing.JButton" default-binding="true">
-        <constraints>
-          <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Fri"/>
         </properties>
       </component>
       <component id="e7468" class="javax.swing.JButton" binding="wedButton" default-binding="true">
@@ -64,15 +48,6 @@
         </constraints>
         <properties>
           <text value="Wed"/>
-        </properties>
-      </component>
-      <component id="68dda" class="javax.swing.JCheckBox" binding="Favourite">
-        <constraints>
-          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <label value="Fav"/>
-          <text value="Fav"/>
         </properties>
       </component>
       <component id="187db" class="javax.swing.JButton" binding="tueButton" default-binding="true">
@@ -108,6 +83,32 @@
           <foreground color="-16777216"/>
           <opaque value="true"/>
           <text value="DANGER! BAD WEATHER OUTSIDE!"/>
+          <visible value="false"/>
+        </properties>
+      </component>
+      <component id="f1aaf" class="javax.swing.JButton" binding="thuButton" default-binding="true">
+        <constraints>
+          <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Thu"/>
+        </properties>
+      </component>
+      <component id="db316" class="javax.swing.JButton" binding="friButton" default-binding="true">
+        <constraints>
+          <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Fri"/>
+        </properties>
+      </component>
+      <component id="68dda" class="javax.swing.JCheckBox" binding="favourite">
+        <constraints>
+          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <label value="Fav"/>
+          <text value="Fav"/>
         </properties>
       </component>
     </children>
