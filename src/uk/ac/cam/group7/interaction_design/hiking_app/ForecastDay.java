@@ -1,20 +1,25 @@
 package uk.ac.cam.group7.interaction_design.hiking_app;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 
+/**
+ * Holds the forecast data for a location for a single day
+ * @author Sam Gooch
+ */
 public class ForecastDay {
 
     private final ArrayList<ForecastElement> forecastStore;
-    private final TimeStamp sunrise;
-    private final TimeStamp sunset;
+    private final LocalTime sunrise;
+    private final LocalTime sunset;
     private final double averageTemp;
     private final WeatherType averageType;
 
     public ForecastDay(ArrayList<ForecastElement> forecasts, int sunriseHour, int sunriseMinute, int sunsetHour,
                        int sunsetMinute, double averageTemp, WeatherType averageType) {
         this.forecastStore = forecasts;
-        this.sunrise = new TimeStamp(sunriseHour, sunriseMinute);
-        this.sunset = new TimeStamp(sunsetHour, sunsetMinute);
+        this.sunrise = LocalTime.of(sunriseHour, sunriseMinute);
+        this.sunset = LocalTime.of(sunsetHour, sunsetMinute);
         this.averageTemp = averageTemp;
         this.averageType = averageType;
     }
@@ -23,11 +28,11 @@ public class ForecastDay {
         return forecastStore;
     }
 
-    public TimeStamp getSunrise() {
+    public LocalTime getSunrise() {
         return sunrise;
     }
 
-    public TimeStamp getSunset() {
+    public LocalTime getSunset() {
         return sunset;
     }
 

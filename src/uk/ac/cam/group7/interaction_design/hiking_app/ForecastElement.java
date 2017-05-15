@@ -1,12 +1,14 @@
 package uk.ac.cam.group7.interaction_design.hiking_app;
 
+import java.time.LocalDateTime;
+
 /**
  * Holds an individual hour's forecast data
  * @author Sam Gooch
  */
 public class ForecastElement {
 
-    private final DateStamp time;
+    private final LocalDateTime forecastTime;
     private final double temperature;
     private final WeatherType type;
     private final double precipitation;
@@ -17,7 +19,7 @@ public class ForecastElement {
     public ForecastElement(int year, int month, int day, int hour, double temperature, WeatherType type,
                            double precipitation, double windSpeed, double windDirection, double humidity,
                            VisibilityType visibility) {
-        this.time = new DateStamp(year, month, day, hour);
+        this.forecastTime = LocalDateTime.of(year, month , day, hour, 0);
         this.temperature = temperature;
         this.type = type;
         this.precipitation = precipitation;
@@ -26,8 +28,8 @@ public class ForecastElement {
         this.visibility = visibility;
     }
 
-    public DateStamp getTime() {
-        return time;
+    public LocalDateTime getForecastTime() {
+        return forecastTime;
     }
 
     public double getTemperature() {
