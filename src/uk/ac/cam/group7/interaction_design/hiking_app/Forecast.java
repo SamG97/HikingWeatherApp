@@ -11,15 +11,17 @@ public class Forecast {
 
     private final List<ForecastDay> dataStore;
     private final LocalDateTime updateTime;
+    private LocalDateTime lastUpdateAttempt;
 
     /**
-     * Initializer for HistoricForecast, will load the data stored in the location accessed by the filename
+     * Constructor for HistoricForecast, will load the data stored in the location accessed by the filename
      * @param forecasts A list of daily forecasts that make up the forecast for a location
      * @param timeStamp The time that the forecast was last updated in the LocalDateTime format
      */
     public Forecast(List<ForecastDay> forecasts, LocalDateTime timeStamp) {
         this.dataStore = forecasts;
         this.updateTime = timeStamp;
+        this.lastUpdateAttempt = LocalDateTime.now();
     }
 
     /**
@@ -36,6 +38,22 @@ public class Forecast {
      */
     public LocalDateTime getUpdateTime() {
         return updateTime;
+    }
+
+    /**
+     * Getter for checking for last update time
+     * @return lastUpdateAttempt Timestamp for last time an update was attempted
+     */
+    public LocalDateTime getLastUpdateAttempt() {
+        return lastUpdateAttempt;
+    }
+
+    /**
+     * Marks last update attempt
+     * @param lastUpdateAttempt Last time that an attempt was made to update the forecast
+     */
+    public void setLastUpdateAttempt(LocalDateTime lastUpdateAttempt) {
+        this.lastUpdateAttempt = lastUpdateAttempt;
     }
 
 }
