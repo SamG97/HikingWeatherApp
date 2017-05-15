@@ -8,7 +8,7 @@ package uk.ac.cam.group7.interaction_design.hiking_app;
  *  @author dobrik
  */
 public class Location {
-    private final int latitude, longtitude;
+    private final int latitude, longitude;
     private String name=null;
     private boolean isFavourite=false;
 
@@ -19,12 +19,12 @@ public class Location {
      * and makes a new Location class with these coordinates
      * @param _latitude
      * Latitude of location
-     * @param _longtitude
+     * @param _longitude
      * Longitude of location
      */
-    public Location(int _latitude,int _longtitude){
+    public Location(int _latitude,int _longitude){
         latitude=_latitude;
-        longtitude=_longtitude;
+        longitude =_longitude;
     }
 
     /**
@@ -40,7 +40,7 @@ public class Location {
      */
     public Location(int _latitude,int _longtitude,String _name){
         latitude=_latitude;
-        longtitude=_longtitude;
+        longitude =_longtitude;
         name=_name;
     }
 
@@ -54,12 +54,12 @@ public class Location {
     }
 
     /**
-     * Getter for longtitude
+     * Getter for longitude
      * @return
-     * longtitude (integer), you idiot, do you expect something else
+     * longitude (integer), you idiot, do you expect something else
      */
-    public int getLongtitude(){
-        return longtitude;
+    public int getLongitude(){
+        return longitude;
     }
 
     /**
@@ -111,7 +111,7 @@ public class Location {
         Location location = (Location) o;
 
         if (latitude != location.latitude) return false;
-        if (longtitude != location.longtitude) return false;
+        if (longitude != location.longitude) return false;
         return name != null ? name.equals(location.name) : location.name == null;
     }
 
@@ -123,7 +123,7 @@ public class Location {
     @Override
     public int hashCode() {
         int result = latitude;
-        result = 31 * result + longtitude;
+        result = 31 * result + longitude;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }
@@ -136,7 +136,7 @@ public class Location {
     @Override
     public String toString() {
         if(name!=null)return name;
-        return "("+latitude+","+longtitude+")";
+        return "("+latitude+","+ longitude +")";
     }
     //public static void main(String args[]){
     //    Location test=new Location(11,22,"haway");
