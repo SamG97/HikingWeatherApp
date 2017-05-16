@@ -6,7 +6,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.*;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 
@@ -15,7 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
+import java.nio.file.Path;
 
 /**
  * SearchPanel for latitude and longtitude
@@ -72,7 +77,7 @@ public class SearchPanel extends JPanel {
             double lat=0;
             @Override
             public void actionPerformed(ActionEvent event) {
-                if(latitudeInputField.getText()==""||longtitudeInputField.getText()==""){
+                if(latitudeInputField.getText().equals("")||longtitudeInputField.getText().equals("")){
                     JOptionPane.showMessageDialog(null, "Please fill both fields");
                     return;
                 }
@@ -111,7 +116,137 @@ public class SearchPanel extends JPanel {
                     }
                 }
                 Location curr;
-                curr=new Location(lat,longt);
+                curr=new Location(lat, longt, false, new Path() {
+                    @Override
+                    public FileSystem getFileSystem() {
+                        return null;
+                    }
+
+                    @Override
+                    public boolean isAbsolute() {
+                        return false;
+                    }
+
+                    @Override
+                    public Path getRoot() {
+                        return null;
+                    }
+
+                    @Override
+                    public Path getFileName() {
+                        return null;
+                    }
+
+                    @Override
+                    public Path getParent() {
+                        return null;
+                    }
+
+                    @Override
+                    public int getNameCount() {
+                        return 0;
+                    }
+
+                    @Override
+                    public Path getName(int i) {
+                        return null;
+                    }
+
+                    @Override
+                    public Path subpath(int i, int i1) {
+                        return null;
+                    }
+
+                    @Override
+                    public boolean startsWith(Path path) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean startsWith(String s) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean endsWith(Path path) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean endsWith(String s) {
+                        return false;
+                    }
+
+                    @Override
+                    public Path normalize() {
+                        return null;
+                    }
+
+                    @Override
+                    public Path resolve(Path path) {
+                        return null;
+                    }
+
+                    @Override
+                    public Path resolve(String s) {
+                        return null;
+                    }
+
+                    @Override
+                    public Path resolveSibling(Path path) {
+                        return null;
+                    }
+
+                    @Override
+                    public Path resolveSibling(String s) {
+                        return null;
+                    }
+
+                    @Override
+                    public Path relativize(Path path) {
+                        return null;
+                    }
+
+                    @Override
+                    public URI toUri() {
+                        return null;
+                    }
+
+                    @Override
+                    public Path toAbsolutePath() {
+                        return null;
+                    }
+
+                    @Override
+                    public Path toRealPath(LinkOption... linkOptions) throws IOException {
+                        return null;
+                    }
+
+                    @Override
+                    public File toFile() {
+                        return null;
+                    }
+
+                    @Override
+                    public WatchKey register(WatchService watchService, WatchEvent.Kind<?>[] kinds, WatchEvent.Modifier... modifiers) throws IOException {
+                        return null;
+                    }
+
+                    @Override
+                    public WatchKey register(WatchService watchService, WatchEvent.Kind<?>[] kinds) throws IOException {
+                        return null;
+                    }
+
+                    @Override
+                    public Iterator<Path> iterator() {
+                        return null;
+                    }
+
+                    @Override
+                    public int compareTo(Path path) {
+                        return 0;
+                    }
+                }, "GG");
                 //
                 if(locationStore.contains(curr)){
                     JOptionPane.showMessageDialog(null, "Can't duplicate loctations");

@@ -4,7 +4,7 @@ import java.nio.file.Path;
 
 /**
  * Holds information about the location
- *  2 ints for Lat and Long (final)
+ *  2 doubles for Lat and Long (final)
  *  String for name (possibly NULL)
  *  boolean for favourite
  *  @author dobrik
@@ -144,5 +144,12 @@ public class Location {
         result = 31 * result + (path != null ? path.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        if(name==null)return "("+latitude+","+longitude+")";
+        return name;
+    }
 }
+
 
