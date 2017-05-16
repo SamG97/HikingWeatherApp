@@ -94,6 +94,19 @@ public class OwmClient {
 		return new WeatherStatusResponse (response);
 	}
 
+	/** Find current weather around coordinates
+	 * @param lat is the latitude of the geographic point of interest (North/South coordinate)
+	 * @param lon is the longitude of the geographic point of interest (East/West coordinate)
+	 * @return the WeaherStatusResponse received
+	 * @throws JSONException if the response from the OWM server can't be parsed
+	 * @throws IOException if there's some network error or the OWM server replies with a error. */
+	public WeatherStatusResponse currentWeatherAtCoords (float lat, float lon) throws IOException, JSONException { //, boolean cluster, OwmClient.Lang lang) {
+		String subUrl = String.format (Locale.ROOT, "find/city?lat=%f&lon=%f",
+				Float.valueOf (lat), Float.valueOf (lon));
+		JSONObject response = doQuery (subUrl);
+		return new WeatherStatusResponse (response);
+	}
+
 	/** Find current weather within a bounding box
 	 * @param northLat is the latitude of the geographic top left point of the bounding box
 	 * @param westLon is the longitude of the geographic top left point of the bounding box
