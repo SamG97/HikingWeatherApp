@@ -1,6 +1,6 @@
 package uk.ac.cam.group7.interaction_design.hiking_app;
 
-import org.bitpipeline.lib.owm.LocalizedWeatherData;
+import org.bitpipeline.lib.owm.StatusWeatherData;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,7 +12,7 @@ import java.nio.file.Path;
  */
 public class JsonReader {
 
-    public static LocalizedWeatherData readJson(Path p) {
+    public static StatusWeatherData readJson(Path p) {
         String read;
         JSONObject json = new JSONObject();
         try {
@@ -38,6 +38,6 @@ public class JsonReader {
         }catch (RuntimeException re) {
             throw re;
         }
-        return new LocalizedWeatherData(json);
+        return new StatusWeatherData(json);
     }
 }
