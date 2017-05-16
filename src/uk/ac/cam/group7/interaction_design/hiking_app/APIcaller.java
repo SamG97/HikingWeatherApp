@@ -1,4 +1,4 @@
-/**
+package uk.ac.cam.group7.interaction_design.hiking_app; /**
  * Created by Dávid on 2017.05.11.
  * Singleton class creating the owm client, it's only purpose is to
  * instantiate the client with our own API-key, and keep it a singleton.
