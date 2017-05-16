@@ -16,11 +16,11 @@ import javax.swing.JButton;
  */
 public class MyButton extends JButton {
 
-    private String name;
+    private String mName;
     public  MyButton(String text) {
 
         super(text);
-        name=text;
+        mName=text;
         this.setContentAreaFilled(false);
 
 

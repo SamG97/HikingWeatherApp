@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import java.util.HashSet;
 import java.util.TreeSet;
 
 
@@ -22,7 +23,7 @@ import javax.swing.JTextField;
  */
 public class SearchPanel extends JPanel {
 
-    private static TreeSet<Location> locationStore=new TreeSet<Location>();
+    private static HashSet<Location> locationStore=new HashSet<Location>();
 
     /**
      * constructor
@@ -110,8 +111,13 @@ public class SearchPanel extends JPanel {
                     }
                 }
                 Location curr;
-                locationStore.clear();
-                locationStore.add(curr=new Location(lat,longt));
+                curr=new Location(lat,longt);
+                //
+                if(locationStore.contains(curr)){
+                    JOptionPane.showMessageDialog(null, "Can't duplicate loctations");
+                    return;
+                }
+                locationStore.add(curr);
                 MainScreen.addScrollField(new AddedLocation(curr));
                 MainScreen.getWindow().setVisible(true);
 

@@ -15,26 +15,26 @@ import javax.swing.border.EtchedBorder;
  */
 class MainScreen  {
 
-    private static JFrame window;
-    private static SearchPanel searchPanel;
-    private static JPanel mainPanel;
+    private static JFrame sWindow;
+    private static SearchPanel sSearchPanel;
+    private static JPanel sMainPanel;
 
 
     /**
      * Constructor for the MainScreen
      */
     public MainScreen() {
-        window = new JFrame("Weather app");
-        window.setPreferredSize(new Dimension(900,700));
-        window.setResizable(false);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        sWindow = new JFrame("Weather app");
+        sWindow.setPreferredSize(new Dimension(900,700));
+        sWindow.setResizable(false);
+        sWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        searchPanel = new SearchPanel();
+        sSearchPanel = new SearchPanel();
 
-        mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
+        sMainPanel = new JPanel();
+        sMainPanel.setLayout(new BoxLayout(sMainPanel, BoxLayout.PAGE_AXIS));
 
-        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        JScrollPane scrollPane = new JScrollPane(sMainPanel);
         scrollPane.setPreferredSize(new Dimension(700,700));
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -42,14 +42,14 @@ class MainScreen  {
 
 
 
-        window.add(scrollPane,BorderLayout.CENTER);
-        window.add(searchPanel,BorderLayout.NORTH);
+        sWindow.add(scrollPane,BorderLayout.CENTER);
+        sWindow.add(sSearchPanel,BorderLayout.NORTH);
 
-        window.pack();
-        window.setVisible(true);
+        sWindow.pack();
+        sWindow.setVisible(true);
 
-        // Window Listeners
-        window.addWindowListener(new WindowAdapter() {
+        // sWindow Listeners
+        sWindow.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
 
@@ -63,19 +63,21 @@ class MainScreen  {
      * static! getter for the window
      * so other panels when called can hide or update it;
      * @return
+     * window returned
      */
     public static JFrame getWindow()
     {
-        return window;
+        return sWindow;
     }
 
     /**
      * ScrollField adder
      * @param input
+     * the location we are adding
      */
     public static void addScrollField(AddedLocation input)
     {
-        mainPanel.add(input);
+        sMainPanel.add(input);
     }
 
     /**

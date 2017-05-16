@@ -3,14 +3,14 @@ package uk.ac.cam.group7.interaction_design.hiking_app;
 /**
  * Holds information about the location
  *  2 ints for Lat and Long (final)
- *  String for name (possibly NULL)
+ *  String for name (possibly "")
  *  boolean for favourite
  *  @author dobrik
  */
 public class Location implements Comparable<Location> {
-    private final double latitude, longtitude;
-    private String name=null;
-    private boolean isFavourite=false;
+    private final double mLatitude, mLongtitude;
+    private String name="";
+    private boolean mFav=false;
 
 
 
@@ -23,8 +23,8 @@ public class Location implements Comparable<Location> {
      * Longitude of location
      */
     public Location(double _latitude,double _longtitude){
-        latitude=_latitude;
-        longtitude=_longtitude;
+        mLatitude=_latitude;
+        mLongtitude=_longtitude;
     }
 
     /**
@@ -40,8 +40,8 @@ public class Location implements Comparable<Location> {
      */
     public Location(double _latitude,double _longtitude,String _name){
 
-        latitude=_latitude;
-        longtitude=_longtitude;
+        mLatitude=_latitude;
+        mLongtitude=_longtitude;
         name=_name;
     }
 
@@ -51,7 +51,7 @@ public class Location implements Comparable<Location> {
      * latitude ofc (integer)
      */
     public double getLatitude(){
-        return latitude;
+        return mLatitude;
     }
 
     /**
@@ -60,7 +60,7 @@ public class Location implements Comparable<Location> {
      * longtitude (integer), you idiot, do you expect something else
      */
     public double getLongtitude(){
-        return longtitude;
+        return mLongtitude;
     }
 
     /**
@@ -78,7 +78,7 @@ public class Location implements Comparable<Location> {
      * boolean for isFavourite or not
      */
     public boolean isFavourite() {
-        return isFavourite;
+        return mFav;
     }
 
     /**
@@ -94,18 +94,18 @@ public class Location implements Comparable<Location> {
      * boolean (false:notFav, true:Fav)
      */
     public void setFavourite(boolean favourite) {
-        isFavourite = favourite;
+        mFav = favourite;
     }
 
     /**
      * String for displaying the location in appropriate form
      *
-     * @return name or coordinates (if name==null)
+     * @return name or coordinates (if name=="")
      */
     @Override
     public String toString() {
-        if(name!=null)return name;
-        return "("+latitude+","+longtitude+")";
+        if(name!="")return name;
+        return "("+mLatitude+","+mLongtitude+")";
     }
 
     /**
@@ -123,8 +123,8 @@ public class Location implements Comparable<Location> {
 
         Location location = (Location) o;
 
-        if (Double.compare(location.latitude, latitude) != 0) return false;
-        return Double.compare(location.longtitude, longtitude) == 0;
+        if (Double.compare(location.getLatitude(), mLatitude) != 0) return false;
+        return Double.compare(location.getLongtitude(), mLongtitude) == 0;
     }
 
     /**
@@ -136,9 +136,9 @@ public class Location implements Comparable<Location> {
     public int hashCode() {
         int result;
         long temp;
-        temp = Double.doubleToLongBits(latitude);
+        temp = Double.doubleToLongBits(mLatitude);
         result = (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(longtitude);
+        temp = Double.doubleToLongBits(mLongtitude);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
@@ -155,29 +155,27 @@ public class Location implements Comparable<Location> {
      */
     @Override
     public int compareTo(Location that) {
-        if (!this.isFavourite&&that.isFavourite()){
+        if (!this.mFav&&that.isFavourite()){
             return -1;
-        } else if (this.isFavourite && !that.isFavourite()) {
+        } else if (this.mFav && !that.isFavourite()) {
             return 1;
         }
 
-        if(this.name==null)return -1;
-        if(that.getName()==null)return 1;
         if (this.name.compareTo(that.getName()) < 0) {
             return -1;
         } else if (this.name.compareTo(that.getName()) > 0) {
             return 1;
         }
 
-        if (this.latitude < that.getLatitude()) {
+        if (this.mLatitude < that.getLatitude()) {
             return -1;
-        } else if (this.latitude > that.getLatitude()) {
+        } else if (this.mLatitude> that.getLatitude()) {
             return 1;
         }
 
-        if (this.longtitude < that.getLongtitude()) {
+        if (this.mLongtitude < that.getLongtitude()) {
             return -1;
-        } else if (this.longtitude > that.getLongtitude()) {
+        } else if (this.mLongtitude > that.getLongtitude()) {
             return 1;
         }
         return 0;
@@ -191,4 +189,5 @@ public class Location implements Comparable<Location> {
     //}
 
 }
+
 

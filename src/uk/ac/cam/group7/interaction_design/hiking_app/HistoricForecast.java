@@ -10,9 +10,8 @@ import java.io.File;
 public class HistoricForecast {
 
     /**
-     * Initializer for HistoricForecast, will load the data stored in the location accessed by the filename
+     * Constructor for HistoricForecast, will load the data stored in the location accessed by the filename
      * @param file The file to be accessed
-     * @return     The forecast data to be accessed
      */
     public HistoricForecast(File file) {
 
