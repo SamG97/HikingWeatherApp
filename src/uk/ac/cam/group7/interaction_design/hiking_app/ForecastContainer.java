@@ -2,6 +2,7 @@ package uk.ac.cam.group7.interaction_design.hiking_app;
 
 import org.bitpipeline.lib.owm.*;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -176,11 +177,27 @@ public class ForecastContainer {
         exportLocations(Paths.get("data" + pSep + "recent"), recentLocations);
     }
 
-    private static StatusWeatherData getAPIResponse(float latitude, float longitude) {
+    private void saveJson(Path p, JSONObject data){
+        ObjectOutputStream outputStream;
+        try{
+            File beingWritten = new File(p.toString());
+            outputStream = new ObjectOutputStream(new FileOutputStream(beingWritten));
+            outputStream.writeObject(data.toString());
+            outputStream.flush();
+            outputStream.close();
+        }catch (IOException e){
+            System.err.println("Error: " + e);
+        }
+    }
+
+    private StatusWeatherData getAPIResponse(Float latitude, Float longitude) {
         try {
-            WeatherStatusResponse nearbyStation = api.currentWeatherAroundPoint(latitude, longitude, 1);
+            String subUrl = String.format (Locale.ROOT, "find/station?lat=%f&lon=%f&cnt=%d&cluster=yes",
+                    latitude, longitude, 1);
+            JSONObject response = api.doQuery(subUrl);
+            WeatherStatusResponse nearbyStation =  new WeatherStatusResponse(response);
             StatusWeatherData forecast = nearbyStation.getWeatherStatus().get(0);
-            //TODO: Save weather data as JSON
+            saveJson(Paths.get("data" + pSep + "recent" + pSep + latitude.toString() + "_" + longitude.toString()),response);
             return forecast;
         } catch (IOException | JSONException e) {
             e.printStackTrace();

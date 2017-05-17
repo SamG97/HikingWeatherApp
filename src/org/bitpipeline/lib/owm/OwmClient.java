@@ -262,7 +262,7 @@ public class OwmClient {
 		return new WeatherHistoryStationResponse (response);
 	}
 
-	private JSONObject doQuery (String subUrl) throws JSONException, IOException {
+	public JSONObject doQuery (String subUrl) throws JSONException, IOException {
 		String responseBody = null;
 		HttpGet httpget = new HttpGet (this.baseOwmUrl + subUrl);
 		if (this.owmAPPID != null) {
