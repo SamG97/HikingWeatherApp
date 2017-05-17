@@ -73,8 +73,8 @@ public class SearchPanel extends JPanel {
          * (c) Dobrik
          */
         searchButton.addActionListener(new ActionListener() {
-            double longt=0;
-            double lat=0;
+            float longt=0;
+            float lat=0;
             @Override
             public void actionPerformed(ActionEvent event) {
                 if(latitudeInputField.getText().equals("")||longtitudeInputField.getText().equals("")){
@@ -84,7 +84,7 @@ public class SearchPanel extends JPanel {
                 if(!latitudeInputField.getText().equals("")){
                     String latS=latitudeInputField.getText();
                     try{
-                        lat=Double.parseDouble(latS);
+                        lat=Float.parseFloat(latS);
                     }
                     catch (NumberFormatException e) {
                         try{
@@ -102,7 +102,7 @@ public class SearchPanel extends JPanel {
                 if(!longtitudeInputField.getText().equals("")){
                     String longtS=longtitudeInputField.getText();
                     try{
-                        longt=Double.parseDouble(longtS);
+                        longt=Float.parseFloat(longtS);
                     }
                     catch (NumberFormatException e) {
                         try{
@@ -115,8 +115,9 @@ public class SearchPanel extends JPanel {
                         }
                     }
                 }
-                Location curr;
-                curr=new Location(lat, longt, false, new Path() {
+                Location curr = new Location(lat, longt);
+                //TODO: Fix the commented out code below as it's preventing compilation
+                /*curr=new Location(lat, longt) {
                     @Override
                     public FileSystem getFileSystem() {
                         return null;
@@ -247,6 +248,7 @@ public class SearchPanel extends JPanel {
                         return 0;
                     }
                 }, "GG");
+                */
                 //
                 if(locationStore.contains(curr)){
                     JOptionPane.showMessageDialog(null, "Can't duplicate loctations");

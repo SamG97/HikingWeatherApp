@@ -13,6 +13,8 @@ public class ForecastContainer {
 
     private final static String pSep = File.pathSeparator;
     private final static OwmClient api = new OwmClient();
+    private final static List<List<WeatherData.WeatherCondition.ConditionCode>> weatherGroupings;
+    private final static Map<Integer, String> severityDescriptor;
 
     private Map<Location, StatusWeatherData> weatherDataMap;
     private List<Location> favouriteLocations;
@@ -20,17 +22,97 @@ public class ForecastContainer {
 
     static {
         api.setAPPID("d12c4a04b7d0170dff8f1afca1e4c0ff");
+
+        weatherGroupings = new LinkedList<>();
+        List<WeatherData.WeatherCondition.ConditionCode> sunny = new LinkedList<>();
+        List<WeatherData.WeatherCondition.ConditionCode> rain = new LinkedList<>();
+        List<WeatherData.WeatherCondition.ConditionCode> severe = new LinkedList<>();
+        List<WeatherData.WeatherCondition.ConditionCode> overcast = new LinkedList<>();
+        List<WeatherData.WeatherCondition.ConditionCode> snow = new LinkedList<>();
+        List<WeatherData.WeatherCondition.ConditionCode> other = new LinkedList<>();
+
+        severe.add(WeatherData.WeatherCondition.ConditionCode.THUNDERSTORM);
+        severe.add(WeatherData.WeatherCondition.ConditionCode.THUNDERSTORM_WITH_DRIZZLE);
+        severe.add(WeatherData.WeatherCondition.ConditionCode.THUNDERSTORM_WITH_HEAVY_DRIZZLE);
+        severe.add(WeatherData.WeatherCondition.ConditionCode.THUNDERSTORM_WITH_HEAVY_RAIN);
+        severe.add(WeatherData.WeatherCondition.ConditionCode.THUNDERSTORM_WITH_LIGHT_DRIZZLE);
+        severe.add(WeatherData.WeatherCondition.ConditionCode.THUNDERSTORM_WITH_LIGHT_RAIN);
+        severe.add(WeatherData.WeatherCondition.ConditionCode.THUNDERSTORM_WITH_RAIN);
+        severe.add(WeatherData.WeatherCondition.ConditionCode.LIGHT_THUNDERSTORM);
+        severe.add(WeatherData.WeatherCondition.ConditionCode.HEAVY_THUNDERSTORM);
+        severe.add(WeatherData.WeatherCondition.ConditionCode.RAGGED_THUNDERSTORM);
+        severe.add(WeatherData.WeatherCondition.ConditionCode.HAIL);
+
+        rain.add(WeatherData.WeatherCondition.ConditionCode.HEAVY_INTENSITY_RAIN);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.LIGHT_INTENSITY_DRIZZLE);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.DRIZZLE);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.HEAVY_INTENSITY_DRIZZLE);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.LIGHT_INTENSITY_DRIZZLE_RAIN);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.DRIZZLE_RAIN);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.HEAVY_INTENSITY_DRIZZLE_RAIN);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.SHOWER_DRIZZLE);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.LIGHT_RAIN);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.MODERATE_RAIN);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.EXTREME_RAIN);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.FREEZING_RAIN);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.LIGHT_INTENSITY_SHOWER_RAIN);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.SHOWER_RAIN);
+        rain.add(WeatherData.WeatherCondition.ConditionCode.HEAVY_INTENSITY_SHOWER_RAIN);
+
+        snow.add(WeatherData.WeatherCondition.ConditionCode.SNOW);
+        snow.add(WeatherData.WeatherCondition.ConditionCode.LIGHT_SNOW);
+        snow.add(WeatherData.WeatherCondition.ConditionCode.HEAVY_SNOW);
+        snow.add(WeatherData.WeatherCondition.ConditionCode.SLEET);
+        snow.add(WeatherData.WeatherCondition.ConditionCode.SHOWER_SNOW);
+
+        overcast.add(WeatherData.WeatherCondition.ConditionCode.FOG);
+        overcast.add(WeatherData.WeatherCondition.ConditionCode.MIST);
+        overcast.add(WeatherData.WeatherCondition.ConditionCode.SMOKE);
+        overcast.add(WeatherData.WeatherCondition.ConditionCode.HAZE);
+        overcast.add(WeatherData.WeatherCondition.ConditionCode.SAND_OR_DUST_WHIRLS);
+        overcast.add(WeatherData.WeatherCondition.ConditionCode.OVERCAST_CLOUDS);
+
+        sunny.add(WeatherData.WeatherCondition.ConditionCode.SKY_IS_CLEAR);
+        sunny.add(WeatherData.WeatherCondition.ConditionCode.FEW_CLOUDS);
+        sunny.add(WeatherData.WeatherCondition.ConditionCode.SCATTERED_CLOUDS);
+        sunny.add(WeatherData.WeatherCondition.ConditionCode.BROKEN_CLOUDS);
+
+        other.add(WeatherData.WeatherCondition.ConditionCode.UNKNOWN);
+        other.add(WeatherData.WeatherCondition.ConditionCode.TORNADO);
+        other.add(WeatherData.WeatherCondition.ConditionCode.TROPICAL_STORM);
+        other.add(WeatherData.WeatherCondition.ConditionCode.HURRICANE);
+        other.add(WeatherData.WeatherCondition.ConditionCode.COLD);
+        other.add(WeatherData.WeatherCondition.ConditionCode.HOT);
+        other.add(WeatherData.WeatherCondition.ConditionCode.WINDY);
+
+        weatherGroupings.add(sunny);
+        weatherGroupings.add(rain);
+        weatherGroupings.add(severe);
+        weatherGroupings.add(overcast);
+        weatherGroupings.add(snow);
+        weatherGroupings.add(other);
+
+        severityDescriptor = new HashMap<>();
+        severityDescriptor.put(1, "yellow");
+        severityDescriptor.put(2, "amber");
+        severityDescriptor.put(3, "red");
     }
 
     public ForecastContainer() {
         weatherDataMap = new HashMap<>();
         favouriteLocations = importLocations(Paths.get("data" + pSep + "favourites"));
         for (Location location : favouriteLocations) {
-            weatherDataMap.put(location, JsonReader.readJson(location.getPath()));
+            StatusWeatherData historicData = JsonReader.readJson(location.getPath());
+            StatusWeatherData currentData = getAPIResponse(location.getLatitude(), location.getLongitude());
+            generateWarnings(historicData, currentData, location);
+            weatherDataMap.put(location, currentData);
         }
         recentLocations = importLocations(Paths.get("data" + pSep + "recent"));
         for (Location location : recentLocations) {
-            weatherDataMap.put(location, JsonReader.readJson(location.getPath()));
+            StatusWeatherData historicData = JsonReader.readJson(location.getPath());
+            StatusWeatherData currentData = getAPIResponse(location.getLatitude(), location.getLongitude());
+            generateWarnings(historicData, currentData, location);
+            weatherDataMap.put(location, currentData);
         }
     }
 
@@ -71,6 +153,14 @@ public class ForecastContainer {
         }
     }
 
+    public void removeLocation(Location location) {
+        if (favouriteLocations.contains(location)) {
+            favouriteLocations.remove(location);
+        } else if (recentLocations.contains(location)) {
+            recentLocations.remove(location);
+        }
+    }
+
     public void saveLocations() {
         exportLocations(Paths.get("data" + pSep + "favourites"), favouriteLocations);
         exportLocations(Paths.get("data" + pSep + "recent"), recentLocations);
@@ -97,14 +187,15 @@ public class ForecastContainer {
             while (!(line == null)) {
                 String[] data = line.split(",");
                 String name = data[0];
-                double latitude = Double.parseDouble(data[1]);
-                double longitude = Double.parseDouble(data[2]);
+                float latitude = Float.parseFloat(data[1]);
+                float longitude = Float.parseFloat(data[2]);
                 boolean isFavourite = Boolean.parseBoolean(data[3]);
                 Path locationPath = Paths.get(data[4]);
-                PriorityQueue<Warning> warnings = new PriorityQueue<>();
+                WarningsContainer warnings = new WarningsContainer();
                 for (int i = 5; i < data.length; i++) {
-                    warnings.add(new Warning(WeatherData.WeatherCondition.ConditionCode.valueof(Integer.parseInt(data[i++])),
-                            Integer.parseInt(data[i])));
+                    warnings.addWarning(
+                            new Warning(WeatherData.WeatherCondition.ConditionCode.valueof(Integer.parseInt(data[i++])),
+                                    data[i++]), Integer.parseInt(data[i]));
                 }
                 locationsList.add(new Location(latitude, longitude, isFavourite, locationPath, name, warnings));
                 r.readLine();
@@ -116,21 +207,124 @@ public class ForecastContainer {
     }
 
     private static void exportLocations(Path path, List<Location> locations) {
-        List<Location> locationsList = new LinkedList<>();
         try {
             BufferedWriter w = Files.newBufferedWriter(path);
             for (Location location : locations) {
                 StringBuilder line = new StringBuilder();
                 line.append(location.getName());
+                line.append(",");
                 line.append(location.getLatitude());
+                line.append(",");
                 line.append(location.getLongitude());
+                line.append(",");
                 line.append(location.isFavourite());
+                line.append(",");
                 line.append(location.getPath());
+                line.append(",");
+                WarningsContainer warnings = location.getAllWarnings();
+                for (Warning warning : warnings.getAllChangeWarnings()) {
+                    line.append(warning.getWarningType());
+                    line.append(",");
+                    line.append(warning.getDescription());
+                    line.append(",0,");
+                }
+                for (Warning warning : warnings.getAllYellowWarnings()) {
+                    line.append(warning.getWarningType());
+                    line.append(",");
+                    line.append(warning.getDescription());
+                    line.append(",1,");
+                }
+                for (Warning warning : warnings.getAllAmberWarnings()) {
+                    line.append(warning.getWarningType());
+                    line.append(",");
+                    line.append(warning.getDescription());
+                    line.append(",2,");
+                }
+                for (Warning warning : warnings.getAllRedWarnings()) {
+                    line.append(warning.getWarningType());
+                    line.append(",");
+                    line.append(warning.getDescription());
+                    line.append(",3,");
+                }
+                line.deleteCharAt(line.length() - 1);
                 line.append("\n");
                 w.write(line.toString());
             }
         } catch (IOException e) {
             throw new RuntimeException("File system improperly configured");
+        }
+    }
+
+    private void generateWarnings(StatusWeatherData oldForecast, StatusWeatherData newForecast, Location location) {
+        if (oldForecast.getTemp() - newForecast.getTemp() > 7) {
+            location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.COLD,
+                    "The forecast is colder than previously forecast"), 0);
+        }
+        if (oldForecast.getTemp() - newForecast.getTemp() < -7) {
+            location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.HOT,
+                    "The forecast is colder than previously forecast"), 0);
+        }
+        if (newForecast.getWind().getSpeed() - oldForecast.getWind().getSpeed() > 10) {
+            location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.WINDY,
+                    "The forecast is windier than previously forecast"), 0);
+        }
+        List<WeatherData.WeatherCondition.ConditionCode> forecastConditionGroup = new LinkedList<>();
+        for (List<WeatherData.WeatherCondition.ConditionCode> group : weatherGroupings) {
+            int correctGroup = 0;
+            for (WeatherData.WeatherCondition condition : newForecast.getWeatherConditions()) {
+                if (group.contains(condition.getCode())) {
+                    correctGroup++;
+                }
+            }
+            if (correctGroup > newForecast.getWeatherConditions().size() / 2) {
+                forecastConditionGroup = group;
+                break;
+            }
+        }
+        if (forecastConditionGroup.size() > 0) {
+            int correctGroup = 0;
+            for (WeatherData.WeatherCondition condition : oldForecast.getWeatherConditions()) {
+                if (forecastConditionGroup.contains(condition.getCode())) {
+                    correctGroup++;
+                }
+            }
+            if (correctGroup < oldForecast.getWeatherConditions().size() / 2) {
+                if (!(forecastConditionGroup.get(0) == WeatherData.WeatherCondition.ConditionCode.UNKNOWN)) {
+                    location.addWarning(new Warning(forecastConditionGroup.get(0),
+                            "The forecast conditions are different to those previously forecast"), 0);
+                }
+            }
+        }
+
+        Random rnd = new Random();
+        rnd.setSeed(0L);
+        if (rnd.nextInt(100) < 5) {
+            int severity = rnd.nextInt(100);
+            if (severity > 95) {
+                severity = 3;
+            } else if (severity > 60) {
+                severity = 2;
+            } else {
+                severity = 1;
+            }
+
+            switch (rnd.nextInt(4)) {
+                case 0: location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.WINDY,
+                        "A Met Office " + severityDescriptor.get(severity) +
+                                " warning of wind has been issued"), severity);
+                case 1: location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.SNOW,
+                        "A Met Office " + severityDescriptor.get(severity) +
+                                " warning of snow has been issued"), severity);
+                case 2: location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.HEAVY_INTENSITY_RAIN,
+                        "A Met Office " + severityDescriptor.get(severity) +
+                                " warning of rain has been issued"), severity);
+                case 3: location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.FOG,
+                        "A Met Office " + severityDescriptor.get(severity) +
+                                " warning of wind has been issued"), severity);
+                case 4: location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.COLD,
+                        "A Met Office " + severityDescriptor.get(severity) +
+                                " warning of ice has been issued"), severity);
+            }
         }
     }
 

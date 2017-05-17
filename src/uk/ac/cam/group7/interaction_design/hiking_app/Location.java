@@ -2,6 +2,7 @@ package uk.ac.cam.group7.interaction_design.hiking_app;
 
 import org.bitpipeline.lib.owm.WeatherData;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.PriorityQueue;
@@ -14,12 +15,13 @@ import java.util.PriorityQueue;
  *  @author dobrik
  */
 public class Location {
-    private final double latitude, longitude;
+    private final float latitude, longitude;
     private String name;
     private boolean isFavourite;
     private final Path path;
-    private PriorityQueue<Warning> warnings;
+    private WarningsContainer warnings;
 
+    private final static String pSep = File.pathSeparator;
 
     /**
      * Constructor that takes no name parameter
@@ -28,16 +30,24 @@ public class Location {
      * Latitude of location
      * @param longitude
      * Longitude of location
-     * @param isFavourite
-     * If location is a favourite
      */
-    public Location(double latitude, double longitude, boolean isFavourite) {
-        this.latitude= latitude;
+    public Location(float latitude, float longitude) {
+        this.latitude = latitude;
         this.longitude = longitude;
         this.name = latitude + ", " + longitude;
-        this.isFavourite = isFavourite;
-        this.path = Paths.get(""); //TODO: Hash to generate path
-        this.warnings = new PriorityQueue<>();
+        this.isFavourite = false;
+        this.path = Paths.get("data" + pSep + generateFileName());
+        this.warnings = new WarningsContainer();
+    }
+
+    private int generateFileName() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(latitude);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(longitude);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
 
     /**
@@ -52,9 +62,9 @@ public class Location {
      * @param path
      * The path to the JSON file storing the raw forecast data
      */
-    public Location(double latitude, double longitude, boolean isFavourite, Path path, String name,
-                    PriorityQueue<Warning> warnings) {
-        this.latitude= latitude;
+    public Location(float latitude, float longitude, boolean isFavourite, Path path, String name,
+                    WarningsContainer warnings) {
+        this.latitude = latitude;
         this.longitude = longitude;
         this.name = name;
         this.isFavourite = isFavourite;
@@ -67,7 +77,7 @@ public class Location {
      * @return
      * latitude (double)
      */
-    public double getLatitude(){
+    public float getLatitude(){
         return latitude;
     }
 
@@ -76,7 +86,7 @@ public class Location {
      * @return
      * longitude (double)
      */
-    public double getLongitude(){
+    public float getLongitude(){
         return longitude;
     }
 
@@ -115,6 +125,22 @@ public class Location {
 
     public Path getPath() {
         return path;
+    }
+
+    public WarningsContainer getAllWarnings() {
+        return warnings;
+    }
+
+    public void addWarning(Warning warning, int severity) {
+        warnings.addWarning(warning, severity);
+    }
+
+    public Warning getTopWarning() {
+        return warnings.getNextWarning();
+    }
+
+    public void acknowledgeWarning() {
+        warnings.acknowledgeWarning();
     }
 
     /**

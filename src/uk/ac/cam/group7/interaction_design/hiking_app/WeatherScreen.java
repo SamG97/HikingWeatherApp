@@ -56,7 +56,7 @@ public class WeatherScreen extends JFrame {
         mFav.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                _loc.setFavourite(!_loc.isFavourite());
+                _loc.toggleFavourite();
                 //System.out.print(_loc.isFavourite());
             }
         });
