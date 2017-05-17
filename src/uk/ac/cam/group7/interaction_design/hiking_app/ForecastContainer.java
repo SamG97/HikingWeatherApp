@@ -7,10 +7,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ForecastContainer {
 
@@ -53,6 +50,15 @@ public class ForecastContainer {
         if (recentLocations.contains(location)) {
             recentLocations.remove(location);
             favouriteLocations.add(0, location);
+            location.toggleFavourite();
+        }
+    }
+
+    public void removeFavourite(Location location) {
+        if (favouriteLocations.contains(location)) {
+            favouriteLocations.remove(location);
+            recentLocations.add(0, location);
+            location.toggleFavourite();
         }
     }
 
@@ -95,7 +101,12 @@ public class ForecastContainer {
                 double longitude = Double.parseDouble(data[2]);
                 boolean isFavourite = Boolean.parseBoolean(data[3]);
                 Path locationPath = Paths.get(data[4]);
-                locationsList.add(new Location(latitude, longitude, isFavourite, locationPath, name));
+                PriorityQueue<Warning> warnings = new PriorityQueue<>();
+                for (int i = 5; i < data.length; i++) {
+                    warnings.add(new Warning(WeatherData.WeatherCondition.ConditionCode.valueof(Integer.parseInt(data[i++])),
+                            Integer.parseInt(data[i])));
+                }
+                locationsList.add(new Location(latitude, longitude, isFavourite, locationPath, name, warnings));
                 r.readLine();
             }
         } catch (IOException e) {

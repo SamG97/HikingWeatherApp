@@ -1,6 +1,10 @@
 package uk.ac.cam.group7.interaction_design.hiking_app;
 
+import org.bitpipeline.lib.owm.WeatherData;
+
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.PriorityQueue;
 
 /**
  * Holds information about the location
@@ -14,6 +18,7 @@ public class Location {
     private String name;
     private boolean isFavourite;
     private final Path path;
+    private PriorityQueue<Warning> warnings;
 
 
     /**
@@ -25,15 +30,14 @@ public class Location {
      * Longitude of location
      * @param isFavourite
      * If location is a favourite
-     * @param path
-     * The path to the JSON file storing the raw forecast data
      */
-    public Location(double latitude, double longitude, boolean isFavourite, Path path) {
+    public Location(double latitude, double longitude, boolean isFavourite) {
         this.latitude= latitude;
         this.longitude = longitude;
         this.name = latitude + ", " + longitude;
         this.isFavourite = isFavourite;
-        this.path = path;
+        this.path = Paths.get(""); //TODO: Hash to generate path
+        this.warnings = new PriorityQueue<>();
     }
 
     /**
@@ -48,12 +52,14 @@ public class Location {
      * @param path
      * The path to the JSON file storing the raw forecast data
      */
-    public Location(double latitude, double longitude, boolean isFavourite, Path path, String name) {
+    public Location(double latitude, double longitude, boolean isFavourite, Path path, String name,
+                    PriorityQueue<Warning> warnings) {
         this.latitude= latitude;
         this.longitude = longitude;
         this.name = name;
         this.isFavourite = isFavourite;
         this.path = path;
+        this.warnings = warnings;
     }
 
     /**
@@ -94,18 +100,17 @@ public class Location {
 
     /**
      * Setter for the name of the location
-     * @param _name
+     * @param name
      * Name of the location
      */
-    public void setName(String _name){name=_name;}
+    public void setName(String name){this.name = name;}
 
     /**
      * Set favourite location
-     * @param favourite
      * boolean (false:notFav, true:Fav)
      */
-    public void setFavourite(boolean favourite) {
-        isFavourite = favourite;
+    public void toggleFavourite() {
+        isFavourite = !isFavourite;
     }
 
     public Path getPath() {
@@ -147,9 +152,9 @@ public class Location {
 
     @Override
     public String toString() {
-        if(name==null)return "("+latitude+","+longitude+")";
-        return name;
+        return getName();
     }
+
 }
 
 
