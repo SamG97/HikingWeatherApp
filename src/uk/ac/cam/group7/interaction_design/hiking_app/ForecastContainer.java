@@ -103,14 +103,24 @@ public class ForecastContainer {
         favouriteLocations = importLocations(Paths.get("data" + pSep + "favourites"));
         for (Location location : favouriteLocations) {
             StatusWeatherData historicData = JsonReader.readJson(location.getPath());
-            StatusWeatherData currentData = getAPIResponse(location.getLatitude(), location.getLongitude());
+            StatusWeatherData currentData;
+            if( historicData.getDateTime() - System.currentTimeMillis() / 1000 < -1800 ){ //Data older than half an hour
+                 currentData = getAPIResponse(location.getLatitude(), location.getLongitude());
+            } else {
+                 currentData = historicData;
+            }
             generateWarnings(historicData, currentData, location);
             weatherDataMap.put(location, currentData);
         }
         recentLocations = importLocations(Paths.get("data" + pSep + "recent"));
         for (Location location : recentLocations) {
             StatusWeatherData historicData = JsonReader.readJson(location.getPath());
-            StatusWeatherData currentData = getAPIResponse(location.getLatitude(), location.getLongitude());
+            StatusWeatherData currentData;
+            if( historicData.getDateTime() - System.currentTimeMillis() / 1000 < -1800 ){ //Data older than half an hour
+                currentData = getAPIResponse(location.getLatitude(), location.getLongitude());
+            } else {
+                currentData = historicData;
+            }
             generateWarnings(historicData, currentData, location);
             weatherDataMap.put(location, currentData);
         }
