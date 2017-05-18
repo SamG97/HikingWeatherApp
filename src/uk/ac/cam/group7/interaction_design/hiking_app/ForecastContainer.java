@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,7 +21,7 @@ public class ForecastContainer {
 
     private final static ForecastContainer reference = new ForecastContainer();
 
-    private final static String pSep = File.pathSeparator;
+    private final static String pSep = "\\";
     private final static OwmClient api = new OwmClient();
     private final static List<List<WeatherData.WeatherCondition.ConditionCode>> weatherGroupings;
     private final static Map<Integer, String> severityDescriptor;
@@ -295,7 +296,6 @@ public class ForecastContainer {
     private static List<Location> importLocations(Path path) {
         List<Location> locationsList = new LinkedList<>();
         try {
-            Files.createFile(path);
             BufferedReader r = Files.newBufferedReader(path);
             String line = r.readLine();
             while (!(line == null)) {
@@ -315,7 +315,11 @@ public class ForecastContainer {
                 r.readLine();
             }
         } catch (IOException e) {
-            throw new RuntimeException("File system improperly configured");
+            try {
+                Files.createFile(path);
+            } catch (IOException f) {
+                throw new RuntimeException("File system improperly configured");
+            }
         }
         return locationsList;
     }
