@@ -271,6 +271,7 @@ public class SearchPanel extends JPanel{
                     return;
                 }
                 locationStore.add(curr);
+                ForecastContainer.getReference().addNewLocation(curr);
                 MainScreen.addScrollField(new AddedLocation(curr));
                 MainScreen.getWindow().setVisible(true);
 
