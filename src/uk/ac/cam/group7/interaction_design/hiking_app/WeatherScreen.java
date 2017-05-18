@@ -25,6 +25,8 @@ public class WeatherScreen extends JFrame {
     private JButton thuButton;
     private JButton friButton;
     private JPanel mHourlyForecastPanel;
+    private JPanel hack;
+    private JScrollPane scrollPane;
     //protected MainScreen mainMenu;
 
     /**
@@ -34,8 +36,8 @@ public class WeatherScreen extends JFrame {
      */
     public WeatherScreen(Location _loc) {
         setTitle("blah");
-        setSize(900, 700);
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        setSize(900, 600);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         add(WeatherPanel);
         location.setText(_loc.toString());
         mFav.setSelected(_loc.isFavourite());
@@ -61,17 +63,36 @@ public class WeatherScreen extends JFrame {
             }
         });
         JPanel fff=new JPanel();
-        fff.setLayout(new FlowLayout());
-        fff.setBorder(BorderFactory.createLineBorder(Color.gray));
         mHourlyForecastPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         mHourlyForecastPanel.setLayout(new BoxLayout(mHourlyForecastPanel,BoxLayout.Y_AXIS));
-        ForecastContainer fc=new ForecastContainer();
+        //ForecastContainer fc=new ForecastContainer();
+        //t
+        //JScrollPane scroll=new JScrollPane(list = new JList(mStore.getPatternsNameSorted().toArray()));
+        //list.addListSelectionListener(this);
+        //patt.setLayout(new BorderLayout());
+        //patt.add(scroll,BorderLayout.CENTER);
+
+        for(int i=1;i<=2004;i++){
+            fff=new JPanel();
+            fff.setLayout(new FlowLayout());
+            fff.setBorder(BorderFactory.createLineBorder(Color.green));
+            fff.setSize(900,50);
+            mHourlyForecastPanel.add(fff);
+        }
+        //JScrollPane scrollPane=new JScrollPane(mHourlyForecastPanel);
+        //WeatherPanel.add(new JScrollPane(hack));
+        //scrollPane.setPreferredSize(new Dimension(700,500));
+        //scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        //scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        //add(scrollPane);
+        //WeatherPanel.add(mHourlyForecastPanel);
+        //mHourlyForecastPanel.setLocation(150,150);
+
         //fc.addToRecent(_loc);
         //Coordinates: 42.7339 25.4858
         //StatusWeatherData swd=fc.getForecast(_loc);
         //System.out.println(swd.getDistance());
 
-        //add(scrollPane);
         //mHourlyForecast.setPreferredSize(new Dimension(700,700));
         //tss.add(new JButton("LLL"));
         //mHourlyForecast.add(new JLabel("LLLLL"));
@@ -81,7 +102,6 @@ public class WeatherScreen extends JFrame {
         //mHourlyForecast.getViewport().setOpaque(false);
         //mHourlyForecast.setBorder(BorderFactory.createLineBorder(Color.BLUE));
 
-        setVisible(true);
         //JList<String> test = new JList<String>(["ss", "g", "i"]);
     }
 }
