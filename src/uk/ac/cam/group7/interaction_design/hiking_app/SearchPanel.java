@@ -131,7 +131,7 @@ public class SearchPanel extends JPanel{
                         }
                     }
                 }
-                Location curr = new Location(lat, longt);
+                Location currentLoc = new Location(lat, longt);
                 //TODO: Fix the commented out code below as it's preventing compilation
                 /*curr=new Location(lat, longt) {
                     @Override
@@ -266,16 +266,13 @@ public class SearchPanel extends JPanel{
                 }, "GG");
                 */
                 //
-                if(locationStore.contains(curr)){
+                  if(MainScreen.contains(currentLoc)){
                     JOptionPane.showMessageDialog(null, "Can't duplicate loctations");
                     return;
                 }
-                locationStore.add(curr);
-                MainScreen.addScrollField(new AddedLocation(curr));
-                MainScreen.getWindow().setVisible(true);
-
-                //MyFrame.addScrollField(new AddedLocation(message));
-                //MyFrame.getWindow().setVisible(true);
+                
+                MainScreen.addNewLocation(new AddedLocation(currentLoc));
+                      
             }
         });
     }
