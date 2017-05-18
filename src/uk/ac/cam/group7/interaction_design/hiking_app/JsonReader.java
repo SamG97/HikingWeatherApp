@@ -40,7 +40,6 @@ public class JsonReader {
         }catch (RuntimeException re) {
             throw re;
         }
-        //
         return new WeatherStatusResponse(json).getWeatherStatus();
     }
 }
