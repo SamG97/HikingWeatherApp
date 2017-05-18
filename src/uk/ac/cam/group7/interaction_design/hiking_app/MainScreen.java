@@ -46,6 +46,7 @@ class MainScreen  {
         sWindow.add(sSearchPanel,BorderLayout.NORTH);
 
         sWindow.pack();
+        scrollPane.requestFocusInWindow(); //Hack to make the Latitude textfield unfocused
         sWindow.setVisible(true);
 
         // sWindow Listeners
