@@ -1,18 +1,20 @@
 package uk.ac.cam.group7.interaction_design.hiking_app;
 
 import org.bitpipeline.lib.owm.StatusWeatherData;
+import org.bitpipeline.lib.owm.WeatherStatusResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Created by Dávid on 2017.05.16..
  */
 public class JsonReader {
 
-    public static StatusWeatherData readJson(Path p) {
+    public static List<StatusWeatherData> readJson(Path p) {
         String read;
         JSONObject json = new JSONObject();
         try {
@@ -38,6 +40,6 @@ public class JsonReader {
         }catch (RuntimeException re) {
             throw re;
         }
-        return new StatusWeatherData(json);
+        return new WeatherStatusResponse(json).getWeatherStatus();
     }
 }
