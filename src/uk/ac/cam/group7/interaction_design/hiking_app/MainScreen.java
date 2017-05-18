@@ -94,7 +94,7 @@ class MainScreen  {
     * to be called when an update session is done 
     */
     
-    private void refreshMain()
+    public static void refreshMain()
     {
     	 
         for(Location recentloc: sForecastContainer.getRecent())
