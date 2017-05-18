@@ -12,13 +12,16 @@ import java.awt.event.MouseEvent;
  */
 public class AddedLocation extends JPanel {
 
-    Location mLoc;
+     private final Location mLoc;
+  private final  AddedLocation test;
+   private final JLabel locName;
     /**
      * Constructor for such panel
      * @param currLoc
      * The location
      */
     public AddedLocation(Location currLoc) {
+        test=this;
         mLoc=currLoc;
         this.setOpaque(false);
         this.setMaximumSize(new Dimension(750,40));
@@ -36,11 +39,11 @@ public class AddedLocation extends JPanel {
             }
         });
 
-        MyButton opt = new MyButton("Options");
+       MyButton opt = new MyButton("Options");
         opt.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                JOptionPane.showMessageDialog(null,"Alex you have to redo it here");
+               OptionsMenu.createToday(test);
             }
         });
 
@@ -51,6 +54,16 @@ public class AddedLocation extends JPanel {
 
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         this.setAlignmentX(Component.LEFT_ALIGNMENT);
+    }
+     public Location getLoc()
+    {
+		return mLoc;
+    	
+    }
+    public void setText(String input)
+    {
+    	mLoc.setName(input);
+    	locName.setText(input);
     }
 
 
