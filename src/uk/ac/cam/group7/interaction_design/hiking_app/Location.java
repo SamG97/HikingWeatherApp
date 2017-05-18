@@ -12,6 +12,7 @@ import java.util.PriorityQueue;
  *  2 doubles for Lat and Long (final)
  *  String for name (possibly NULL)
  *  boolean for favourite
+ *  Warnings container for all warnings
  *  @author dobrik
  */
 public class Location {

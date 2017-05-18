@@ -1,16 +1,17 @@
 package uk.ac.cam.group7.interaction_design.hiking_app;
 
+import org.bitpipeline.lib.owm.StatusWeatherData;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Weather panel that shows up after we click on an location
  * Created by dobrik on 13.05.17.
  */
+
 public class WeatherScreen extends JFrame {
     private JButton mBackButton;
     private JCheckBox mFav;
@@ -23,7 +24,6 @@ public class WeatherScreen extends JFrame {
     private JLabel DangerLabel;
     private JButton thuButton;
     private JButton friButton;
-    private JScrollPane mHourlyForecast;
     private JPanel mHourlyForecastPanel;
     //protected MainScreen mainMenu;
 
@@ -60,18 +60,28 @@ public class WeatherScreen extends JFrame {
                 //System.out.print(_loc.isFavourite());
             }
         });
-        List<JPanel> test = new LinkedList<JPanel>();
-        for (int i = 1; i <= 100; i++) test.add(new JPanel(new GridLayout()));
-        mHourlyForecast = new JScrollPane(new JList(test.toArray()));
-        mHourlyForecastPanel.add(mHourlyForecast, BorderLayout.CENTER);
+        JPanel fff=new JPanel();
+        fff.setLayout(new FlowLayout());
+        fff.setBorder(BorderFactory.createLineBorder(Color.gray));
+        mHourlyForecastPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        mHourlyForecastPanel.setLayout(new BoxLayout(mHourlyForecastPanel,BoxLayout.Y_AXIS));
+        ForecastContainer fc=new ForecastContainer();
+        //fc.addToRecent(_loc);
+        //Coordinates: 42.7339 25.4858
+        //StatusWeatherData swd=fc.getForecast(_loc);
+        //System.out.println(swd.getDistance());
 
-        //mHourlyForecast = new JScrollPane()
+        //add(scrollPane);
+        //mHourlyForecast.setPreferredSize(new Dimension(700,700));
+        //tss.add(new JButton("LLL"));
+        //mHourlyForecast.add(new JLabel("LLLLL"));
+        //mHourlyForecast.setPreferredSize(new Dimension(800,50));//like that?
+        //mHourlyForecast.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        //mHourlyForecast.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        //mHourlyForecast.getViewport().setOpaque(false);
+        //mHourlyForecast.setBorder(BorderFactory.createLineBorder(Color.BLUE));
+
+        setVisible(true);
         //JList<String> test = new JList<String>(["ss", "g", "i"]);
     }
-
-    //    public static void main(String args[]) {
-//        Location rns=new Location(1,2,"KypBa");
-//        rns.setFavourite(true);
-//        JFrame test=new WeatherScreen(rns);
-//    }
 }
