@@ -9,8 +9,8 @@ import java.util.PriorityQueue;
 
 /**
  * Holds information about the location
- * 2 doubles for Lat and Long (final)
- * String for name (possibly NULL)
+ * 2 float for Lat and Long (final)
+ * String for name
  * boolean for favourite
  * Warnings container for all warnings
  *
