@@ -10,7 +10,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+/**
+ * Stores all locations and forecasts in a single format and provides an interface to access this data in a helpful way
+ * Singleton class to prevent multiple instantiation
+ *
+ * @author Sam Gooch
+ */
 public class ForecastContainer {
+
+    private final static ForecastContainer reference = new ForecastContainer();
 
     private final static String pSep = File.pathSeparator;
     private final static OwmClient api = new OwmClient();
@@ -99,26 +107,39 @@ public class ForecastContainer {
         severityDescriptor.put(3, "red");
     }
 
-    public ForecastContainer() {
+    /**
+     * Get a reference to the singleton ForecastContainer
+     *
+     * @return reference
+     */
+    public static ForecastContainer getReference() {
+        return reference;
+    }
+
+    /**
+     * Loads previously saved data and tries to contact the API for fresh data
+     * Generates warnings for the old data if it has changed
+     */
+    private ForecastContainer() {
         weatherDataMap = new HashMap<>();
-        favouriteLocations = importLocations(Paths.get("data" + pSep + "favourites"));
+        favouriteLocations = importLocations(Paths.get("data" + pSep + "favourites.csv"));
         for (Location location : favouriteLocations) {
-            List<StatusWeatherData> historicData = JsonReader.readJson(location.getPath());
+            List<StatusWeatherData> historicData = JsonIO.readJson(location.getPath());
             List<StatusWeatherData> currentData;
-            if( historicData.get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800 ){ //Data older than half an hour
-                 currentData = getAPIResponse(location.getLatitude(), location.getLongitude());
+            if (historicData.get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800) { //Data older than half an hour
+                currentData = getAPIResponse(location.getLatitude(), location.getLongitude(), location.getPath());
             } else {
-                 currentData = historicData;
+                currentData = historicData;
             }
             generateWarnings(historicData, currentData, location);
             weatherDataMap.put(location, currentData);
         }
-        recentLocations = importLocations(Paths.get("data" + pSep + "recent"));
+        recentLocations = importLocations(Paths.get("data" + pSep + "recent.csv"));
         for (Location location : recentLocations) {
-            List<StatusWeatherData> historicData = JsonReader.readJson(location.getPath());
+            List<StatusWeatherData> historicData = JsonIO.readJson(location.getPath());
             List<StatusWeatherData> currentData;
-            if( historicData.get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800 ){ //Data older than half an hour
-                currentData = getAPIResponse(location.getLatitude(), location.getLongitude());
+            if (historicData.get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800) { //Data older than half an hour
+                currentData = getAPIResponse(location.getLatitude(), location.getLongitude(), location.getPath());
             } else {
                 currentData = historicData;
             }
@@ -126,36 +147,80 @@ public class ForecastContainer {
         }
     }
 
+    /**
+     * Returns the list of favourite locations
+     *
+     * @return favouriteLocations A list of favourite locations
+     */
     public List<Location> getFavourites() {
         return favouriteLocations;
     }
 
+    /**
+     * Returns the list of recently accessed locations
+     *
+     * @return recentLocation A list of recent locations
+     */
     public List<Location> getRecent() {
         return recentLocations;
     }
 
+    /**
+     * Fetches data on a stored location and updates the list of recently accessed locations
+     * Updates the stored forecast if the data is more than 30 minutes old
+     *
+     * @param location The location for which the forecast is desired
+     * @return List<StatusWeatherData> The weather forecast for that location
+     */
     public List<StatusWeatherData> getForecast(Location location) {
+        if (!(favouriteLocations.contains(location))) {
+            if (recentLocations.contains(location)) {
+                recentLocations.remove(location);
+            }
+            addToRecent(location);
+        }
+        if (weatherDataMap.get(location).get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800) {
+            weatherDataMap.put(location, getAPIResponse(location.getLatitude(), location.getLongitude(),
+                    location.getPath()));
+        }
         return weatherDataMap.get(location);
     }
 
+    /**
+     * Adds a specified location to the favourites list
+     *
+     * @param location The location to add
+     */
     public void makeFavourite(Location location) {
         if (recentLocations.contains(location)) {
             recentLocations.remove(location);
             favouriteLocations.add(0, location);
             location.toggleFavourite();
         }
+        saveLocations();
     }
 
+    /**
+     * Removes a specified location from the favourites list
+     *
+     * @param location The location to remove
+     */
     public void removeFavourite(Location location) {
         if (favouriteLocations.contains(location)) {
             favouriteLocations.remove(location);
-            recentLocations.add(0, location);
             location.toggleFavourite();
+            addToRecent(location);
         }
+        saveLocations();
     }
 
-    public void addToRecent(Location location) {
-        if(!favouriteLocations.contains(location)) {
+    /**
+     * Adds a specified location to the recent location list
+     *
+     * @param location The location to add
+     */
+    private void addToRecent(Location location) {
+        if (!favouriteLocations.contains(location)) {
             recentLocations.add(0, location);
             if (recentLocations.size() > 100) {
                 recentLocations = recentLocations.subList(0, 100);
@@ -163,40 +228,57 @@ public class ForecastContainer {
         }
     }
 
+    /**
+     * Removes a specified location from the recent location list
+     *
+     * @param location The location to remove
+     */
     public void removeLocation(Location location) {
         if (favouriteLocations.contains(location)) {
             favouriteLocations.remove(location);
         } else if (recentLocations.contains(location)) {
             recentLocations.remove(location);
         }
+        weatherDataMap.remove(location);
+        saveLocations();
     }
 
-    public void saveLocations() {
-        exportLocations(Paths.get("data" + pSep + "favourites"), favouriteLocations);
-        exportLocations(Paths.get("data" + pSep + "recent"), recentLocations);
+    /**
+     * Saves location data
+     */
+    private void saveLocations() {
+        exportLocations(Paths.get("data" + pSep + "favourites.csv"), favouriteLocations);
+        exportLocations(Paths.get("data" + pSep + "recent.csv"), recentLocations);
     }
 
-    private void saveJson(Path p, JSONObject data){
-        ObjectOutputStream outputStream;
-        try{
-            File beingWritten = new File(p.toString());
-            outputStream = new ObjectOutputStream(new FileOutputStream(beingWritten));
-            outputStream.writeObject(data.toString());
-            outputStream.flush();
-            outputStream.close();
-        }catch (IOException e){
-            System.err.println("Error: " + e);
-        }
+    /**
+     * Adds a new location to the data structure
+     *
+     * @param location The new location to add
+     */
+    public void addNewLocation(Location location) {
+        weatherDataMap.put(location, getAPIResponse(location.getLatitude(), location.getLongitude(),
+                location.getPath()));
+        addToRecent(location);
+        saveLocations();
     }
 
-    private List<StatusWeatherData> getAPIResponse(Float latitude, Float longitude) {
+    /**
+     * Gets a response from the API for a requested location
+     *
+     * @param latitude  The latitude of the location
+     * @param longitude The longitude of the location
+     * @param path      The path to save the weather data at
+     * @return The forecast for that location
+     */
+    private List<StatusWeatherData> getAPIResponse(Float latitude, Float longitude, Path path) {
         try {
-            String subUrl = String.format (Locale.ROOT, "find/station?lat=%f&lon=%f&cnt=%d&cluster=yes",
+            String subUrl = String.format(Locale.ROOT, "find/station?lat=%f&lon=%f&cnt=%d&cluster=yes",
                     latitude, longitude, 1);
             JSONObject response = api.doQuery(subUrl);
-            WeatherStatusResponse nearbyStation =  new WeatherStatusResponse(response);
+            WeatherStatusResponse nearbyStation = new WeatherStatusResponse(response);
             List<StatusWeatherData> forecast = nearbyStation.getWeatherStatus();
-            saveJson(Paths.get("data" + pSep + "recent" + pSep + latitude.toString() + "_" + longitude.toString()),response);
+            JsonIO.saveJson(path, response);
             return forecast;
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -204,6 +286,12 @@ public class ForecastContainer {
         }
     }
 
+    /**
+     * Imports the save locations on disk on startup
+     *
+     * @param path The file to read the list of locations from
+     * @return The list of locations stored in the provided file
+     */
     private static List<Location> importLocations(Path path) {
         List<Location> locationsList = new LinkedList<>();
         try {
@@ -232,6 +320,12 @@ public class ForecastContainer {
         return locationsList;
     }
 
+    /**
+     * Saves all locations in a list to disk
+     *
+     * @param path      The file to save the locations to
+     * @param locations The list of locations to save
+     */
     private static void exportLocations(Path path, List<Location> locations) {
         try {
             BufferedWriter w = Files.newBufferedWriter(path);
@@ -281,7 +375,15 @@ public class ForecastContainer {
         }
     }
 
-    private void generateWarnings(List<StatusWeatherData> oldForecast, List<StatusWeatherData> newForecast, Location location) {
+    /**
+     * Generates weather warnings
+     *
+     * @param oldForecast The historic forecast on disk
+     * @param newForecast The new forecast from the API response
+     * @param location    The location to evaluate the warnings for
+     */
+    private void generateWarnings(List<StatusWeatherData> oldForecast, List<StatusWeatherData> newForecast,
+                                  Location location) {
         int oldIndex = 0;
         while (oldForecast.get(oldIndex).getDateTime() < newForecast.get(0).getDateTime()) {
             oldIndex++;
@@ -322,12 +424,12 @@ public class ForecastContainer {
                 if (correctGroup < oldForecast.get(oldIndex).getWeatherConditions().size() / 2) {
                     if (!(forecastConditionGroup.get(0) == WeatherData.WeatherCondition.ConditionCode.UNKNOWN)) {
                         location.addWarning(new Warning(forecastConditionGroup.get(0),
-                                "The forecast conditions are different to those previously forecast"), 0);
+                                        "The forecast conditions are different to those previously forecast"),
+                                0);
                     }
                 }
             }
         }
-
 
         // Randomly generates more serious weather warning for now as a test since a suitable API could not be found
         Random rnd = new Random();
@@ -343,21 +445,26 @@ public class ForecastContainer {
             }
 
             switch (rnd.nextInt(4)) {
-                case 0: location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.WINDY,
-                        "A Met Office " + severityDescriptor.get(severity) +
-                                " warning of wind has been issued"), severity);
-                case 1: location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.SNOW,
-                        "A Met Office " + severityDescriptor.get(severity) +
-                                " warning of snow has been issued"), severity);
-                case 2: location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.HEAVY_INTENSITY_RAIN,
-                        "A Met Office " + severityDescriptor.get(severity) +
-                                " warning of rain has been issued"), severity);
-                case 3: location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.FOG,
-                        "A Met Office " + severityDescriptor.get(severity) +
-                                " warning of wind has been issued"), severity);
-                case 4: location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.COLD,
-                        "A Met Office " + severityDescriptor.get(severity) +
-                                " warning of ice has been issued"), severity);
+                case 0:
+                    location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.WINDY,
+                            "A Met Office " + severityDescriptor.get(severity) +
+                                    " warning of wind has been issued"), severity);
+                case 1:
+                    location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.SNOW,
+                            "A Met Office " + severityDescriptor.get(severity) +
+                                    " warning of snow has been issued"), severity);
+                case 2:
+                    location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.HEAVY_INTENSITY_RAIN,
+                            "A Met Office " + severityDescriptor.get(severity) +
+                                    " warning of rain has been issued"), severity);
+                case 3:
+                    location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.FOG,
+                            "A Met Office " + severityDescriptor.get(severity) +
+                                    " warning of wind has been issued"), severity);
+                case 4:
+                    location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.COLD,
+                            "A Met Office " + severityDescriptor.get(severity) +
+                                    " warning of ice has been issued"), severity);
             }
         }
     }

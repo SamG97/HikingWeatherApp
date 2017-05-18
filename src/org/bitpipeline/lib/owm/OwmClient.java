@@ -35,6 +35,9 @@ import org.json.JSONObject;
 /** Implements a synchronous HTTP client to the Open Weather Map service described
  * in http://openweathermap.org/wiki/API/JSON_API
  * @author mtavares */
+
+/* Modified from the original!
+* */
 public class OwmClient {
 	static private final String APPID_HEADER = "x-api-key";
 
@@ -43,7 +46,7 @@ public class OwmClient {
 		TICK, HOUR, DAY 
 	}
 
-	private String baseOwmUrl = "http://api.openweathermap.org/data/2.1/";
+	private String baseOwmUrl = "http://api.openweathermap.org/data/2.5/";
 	private String owmAPPID = "d12c4a04b7d0170dff8f1afca1e4c0ff";
 
 	private HttpClient httpClient;

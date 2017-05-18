@@ -10,15 +10,23 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Created by Dávid on 2017.05.16..
+ * Reads and writes JSON files to disk
+ *
+ * @author Dávid
  */
-public class JsonReader {
+public class JsonIO {
 
-    public static List<StatusWeatherData> readJson(Path p) {
+    /**
+     * Reads a JSON file in from disk
+     *
+     * @param path The path to the file on disk
+     * @return List<StatusWeatherData> The forecast stored in the file
+     */
+    public static List<StatusWeatherData> readJson(Path path) {
         String read;
         JSONObject json = new JSONObject();
         try {
-            File input = new File(p.toUri());
+            File input = new File(path.toUri());
             InputStream fileIn = new FileInputStream(input);
             Reader isReader = new BufferedReader(new InputStreamReader(fileIn));
             int fileSize = (int) input.length();
@@ -33,14 +41,29 @@ public class JsonReader {
             read = strWriter.toString();
             fileIn.close();
             json = new JSONObject(read);
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             System.out.println(e.getMessage());
-        } catch (JSONException e) {
-            System.out.println(e.getMessage());
-        }catch (RuntimeException re) {
-            throw re;
         }
-        //
+
         return new WeatherStatusResponse(json).getWeatherStatus();
+    }
+
+    /**
+     * Writes a JSON file to disk
+     *
+     * @param path The path to the file on disk to write to
+     * @param data The JSON file to save
+     */
+    public static void saveJson(Path path, JSONObject data) {
+        ObjectOutputStream outputStream;
+        try {
+            File beingWritten = new File(path.toString());
+            outputStream = new ObjectOutputStream(new FileOutputStream(beingWritten));
+            outputStream.writeObject(data.toString());
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            System.err.println("Error: " + e);
+        }
     }
 }
