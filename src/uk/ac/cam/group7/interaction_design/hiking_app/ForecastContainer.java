@@ -312,8 +312,9 @@ public class ForecastContainer {
                                     data[i++]), Integer.parseInt(data[i]));
                 }
                 locationsList.add(new Location(latitude, longitude, isFavourite, locationPath, name, warnings));
-                r.readLine();
+                line = r.readLine();
             }
+            r.close();
         } catch (IOException e) {
             try {
                 Files.createFile(path);
@@ -374,6 +375,7 @@ public class ForecastContainer {
                 line.append("\n");
                 w.write(line.toString());
             }
+            w.close();
         } catch (IOException e) {
             throw new RuntimeException("File system improperly configured");
         }
