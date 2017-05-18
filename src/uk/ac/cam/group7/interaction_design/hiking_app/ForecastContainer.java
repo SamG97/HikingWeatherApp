@@ -274,8 +274,8 @@ public class ForecastContainer {
      */
     private List<StatusWeatherData> getAPIResponse(Float latitude, Float longitude, Path path) {
         try {
-            String subUrl = String.format(Locale.ROOT, "find/station?lat=%f&lon=%f&cnt=%d&cluster=yes",
-                    latitude, longitude, 1);
+            String subUrl = String.format(Locale.ROOT, "forecast?lat=%f&lon=%f&",
+                    latitude, longitude);
             JSONObject response = api.doQuery(subUrl);
             WeatherStatusResponse nearbyStation = new WeatherStatusResponse(response);
             List<StatusWeatherData> forecast = nearbyStation.getWeatherStatus();
