@@ -17,7 +17,7 @@ public class ForecastContainer {
     private final static List<List<WeatherData.WeatherCondition.ConditionCode>> weatherGroupings;
     private final static Map<Integer, String> severityDescriptor;
 
-    private Map<Location, StatusWeatherData> weatherDataMap;
+    private Map<Location, List<StatusWeatherData>> weatherDataMap;
     private List<Location> favouriteLocations;
     private List<Location> recentLocations;
 
@@ -103,9 +103,9 @@ public class ForecastContainer {
         weatherDataMap = new HashMap<>();
         favouriteLocations = importLocations(Paths.get("data" + pSep + "favourites"));
         for (Location location : favouriteLocations) {
-            StatusWeatherData historicData = JsonReader.readJson(location.getPath());
-            StatusWeatherData currentData;
-            if( historicData.getDateTime() - System.currentTimeMillis() / 1000 < -1800 ){ //Data older than half an hour
+            List<StatusWeatherData> historicData = JsonReader.readJson(location.getPath());
+            List<StatusWeatherData> currentData;
+            if( historicData.get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800 ){ //Data older than half an hour
                  currentData = getAPIResponse(location.getLatitude(), location.getLongitude());
             } else {
                  currentData = historicData;
@@ -115,14 +115,13 @@ public class ForecastContainer {
         }
         recentLocations = importLocations(Paths.get("data" + pSep + "recent"));
         for (Location location : recentLocations) {
-            StatusWeatherData historicData = JsonReader.readJson(location.getPath());
-            StatusWeatherData currentData;
-            if( historicData.getDateTime() - System.currentTimeMillis() / 1000 < -1800 ){ //Data older than half an hour
+            List<StatusWeatherData> historicData = JsonReader.readJson(location.getPath());
+            List<StatusWeatherData> currentData;
+            if( historicData.get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800 ){ //Data older than half an hour
                 currentData = getAPIResponse(location.getLatitude(), location.getLongitude());
             } else {
                 currentData = historicData;
             }
-            generateWarnings(historicData, currentData, location);
             weatherDataMap.put(location, currentData);
         }
     }
@@ -135,7 +134,7 @@ public class ForecastContainer {
         return recentLocations;
     }
 
-    public StatusWeatherData getForecast(Location location) {
+    public List<StatusWeatherData> getForecast(Location location) {
         return weatherDataMap.get(location);
     }
 
@@ -190,13 +189,13 @@ public class ForecastContainer {
         }
     }
 
-    private StatusWeatherData getAPIResponse(Float latitude, Float longitude) {
+    private List<StatusWeatherData> getAPIResponse(Float latitude, Float longitude) {
         try {
             String subUrl = String.format (Locale.ROOT, "find/station?lat=%f&lon=%f&cnt=%d&cluster=yes",
                     latitude, longitude, 1);
             JSONObject response = api.doQuery(subUrl);
             WeatherStatusResponse nearbyStation =  new WeatherStatusResponse(response);
-            StatusWeatherData forecast = nearbyStation.getWeatherStatus().get(0);
+            List<StatusWeatherData> forecast = nearbyStation.getWeatherStatus();
             saveJson(Paths.get("data" + pSep + "recent" + pSep + latitude.toString() + "_" + longitude.toString()),response);
             return forecast;
         } catch (IOException | JSONException e) {
@@ -282,47 +281,55 @@ public class ForecastContainer {
         }
     }
 
-    private void generateWarnings(StatusWeatherData oldForecast, StatusWeatherData newForecast, Location location) {
-        if (oldForecast.getTemp() - newForecast.getTemp() > 7) {
-            location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.COLD,
-                    "The forecast is colder than previously forecast"), 0);
+    private void generateWarnings(List<StatusWeatherData> oldForecast, List<StatusWeatherData> newForecast, Location location) {
+        int oldIndex = 0;
+        while (oldForecast.get(oldIndex).getDateTime() < newForecast.get(0).getDateTime()) {
+            oldIndex++;
         }
-        if (oldForecast.getTemp() - newForecast.getTemp() < -7) {
-            location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.HOT,
-                    "The forecast is colder than previously forecast"), 0);
-        }
-        if (newForecast.getWind().getSpeed() - oldForecast.getWind().getSpeed() > 10) {
-            location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.WINDY,
-                    "The forecast is windier than previously forecast"), 0);
-        }
-        List<WeatherData.WeatherCondition.ConditionCode> forecastConditionGroup = new LinkedList<>();
-        for (List<WeatherData.WeatherCondition.ConditionCode> group : weatherGroupings) {
-            int correctGroup = 0;
-            for (WeatherData.WeatherCondition condition : newForecast.getWeatherConditions()) {
-                if (group.contains(condition.getCode())) {
-                    correctGroup++;
+        for (int newIndex = 0; newIndex < oldForecast.size(); oldIndex++, newIndex++) {
+            if (oldForecast.get(oldIndex).getTemp() - newForecast.get(newIndex).getTemp() > 7) {
+                location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.COLD,
+                        "The forecast is colder than previously forecast"), 0);
+            }
+            if (oldForecast.get(oldIndex).getTemp() - newForecast.get(newIndex).getTemp() < -7) {
+                location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.HOT,
+                        "The forecast is colder than previously forecast"), 0);
+            }
+            if (newForecast.get(newIndex).getWind().getSpeed() - oldForecast.get(oldIndex).getWind().getSpeed() > 10) {
+                location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.WINDY,
+                        "The forecast is windier than previously forecast"), 0);
+            }
+            List<WeatherData.WeatherCondition.ConditionCode> forecastConditionGroup = new LinkedList<>();
+            for (List<WeatherData.WeatherCondition.ConditionCode> group : weatherGroupings) {
+                int correctGroup = 0;
+                for (WeatherData.WeatherCondition condition : newForecast.get(newIndex).getWeatherConditions()) {
+                    if (group.contains(condition.getCode())) {
+                        correctGroup++;
+                    }
+                }
+                if (correctGroup > newForecast.get(newIndex).getWeatherConditions().size() / 2) {
+                    forecastConditionGroup = group;
+                    break;
                 }
             }
-            if (correctGroup > newForecast.getWeatherConditions().size() / 2) {
-                forecastConditionGroup = group;
-                break;
-            }
-        }
-        if (forecastConditionGroup.size() > 0) {
-            int correctGroup = 0;
-            for (WeatherData.WeatherCondition condition : oldForecast.getWeatherConditions()) {
-                if (forecastConditionGroup.contains(condition.getCode())) {
-                    correctGroup++;
+            if (forecastConditionGroup.size() > 0) {
+                int correctGroup = 0;
+                for (WeatherData.WeatherCondition condition : oldForecast.get(oldIndex).getWeatherConditions()) {
+                    if (forecastConditionGroup.contains(condition.getCode())) {
+                        correctGroup++;
+                    }
                 }
-            }
-            if (correctGroup < oldForecast.getWeatherConditions().size() / 2) {
-                if (!(forecastConditionGroup.get(0) == WeatherData.WeatherCondition.ConditionCode.UNKNOWN)) {
-                    location.addWarning(new Warning(forecastConditionGroup.get(0),
-                            "The forecast conditions are different to those previously forecast"), 0);
+                if (correctGroup < oldForecast.get(oldIndex).getWeatherConditions().size() / 2) {
+                    if (!(forecastConditionGroup.get(0) == WeatherData.WeatherCondition.ConditionCode.UNKNOWN)) {
+                        location.addWarning(new Warning(forecastConditionGroup.get(0),
+                                "The forecast conditions are different to those previously forecast"), 0);
+                    }
                 }
             }
         }
 
+
+        // Randomly generates more serious weather warning for now as a test since a suitable API could not be found
         Random rnd = new Random();
         rnd.setSeed(0L);
         if (rnd.nextInt(100) < 5) {
