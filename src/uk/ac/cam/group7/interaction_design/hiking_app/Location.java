@@ -1,11 +1,8 @@
 package uk.ac.cam.group7.interaction_design.hiking_app;
 
-import org.bitpipeline.lib.owm.WeatherData;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.PriorityQueue;
 
 /**
  * Holds information about the location
@@ -23,7 +20,7 @@ public class Location {
     private final Path path;
     private WarningsContainer warnings;
 
-    private final static String pSep = File.pathSeparator;
+    private final static String pSep = File.separator;
 
     /**
      * Constructor that takes no name parameter
@@ -37,7 +34,8 @@ public class Location {
         this.longitude = longitude;
         this.name = latitude + ", " + longitude;
         this.isFavourite = false;
-        this.path = Paths.get("data" + pSep + generateFileName());
+        System.out.println("data" + pSep + generateFileName() + ".json");
+        this.path = Paths.get("data" + pSep + generateFileName() + ".json");
         this.warnings = new WarningsContainer();
     }
 
