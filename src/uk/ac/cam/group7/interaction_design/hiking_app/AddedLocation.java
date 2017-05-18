@@ -28,7 +28,9 @@ public class AddedLocation extends JPanel {
 
         JLabel locName= new JLabel(currLoc.toString(),JLabel.CENTER);
         locName.setFont(new Font("Courier New", Font.BOLD, 26));
-        locName.setMinimumSize(new Dimension(0,60));
+       locName.setMinimumSize(new Dimension(260,40));
+        locName.setPreferredSize(new Dimension(260,40));
+        locName.setMaximumSize(new Dimension(260,40));
         locName.setForeground(Color.DARK_GRAY);
         locName.addMouseListener(new MouseAdapter() {
             @Override
@@ -46,10 +48,24 @@ public class AddedLocation extends JPanel {
                OptionsMenu.createToday(test);
             }
         });
+	    
+	    
+	 JPanel icon;
+       try{
+    	   icon = new MyIcon("to be implemented");
+       } catch (IOException e) {
+    	   icon = new JPanel(); 
+    	   icon.setPreferredSize(new Dimension(40,30));
+    	   icon.setMaximumSize(new Dimension(40,30));
+    	   icon.setMinimumSize(new Dimension(40,30));
+    	   
+       }
 
-        this.add(opt);
+         this.add(opt);
         this.add(Box.createRigidArea(new Dimension(25,0)));
         this.add(locName);
+        this.add(Box.createRigidArea(new Dimension(150,0)));
+        this.add(icon);
 
 
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
