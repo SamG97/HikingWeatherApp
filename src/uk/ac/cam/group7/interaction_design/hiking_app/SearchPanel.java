@@ -1,10 +1,7 @@
 package uk.ac.cam.group7.interaction_design.hiking_app;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.*;
+import java.awt.event.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +23,7 @@ import java.nio.file.Path;
  * SearchPanel for latitude and longtitude
  * @author Alex
  */
-public class SearchPanel extends JPanel {
+public class SearchPanel extends JPanel{
 
     private static HashSet<Location> locationStore=new HashSet<Location>();
 
@@ -39,32 +36,48 @@ public class SearchPanel extends JPanel {
         this.setPreferredSize(new Dimension(700,60));
 
 
-        JTextField latitudeInputField = new JTextField("type here");
-        JTextField longtitudeInputField = new JTextField("type here");
+        JTextField latitudeInputField = new JTextField("Latitude");
+        JTextField longitudeInputField = new JTextField("Longitude");
         JButton searchButton = new MyButton("Search"); // search button
-        searchButton.setEnabled(false);// when there is not text the button is disabled
+        searchButton.setEnabled(true);// when there is not text the button is disabled
+        //Leave it enabled, input sanitization will catch it
 
+        latitudeInputField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if(latitudeInputField.getText().equals("Latitude")) {
+                    latitudeInputField.setText("");
+                }
+            }
 
-
-
-        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        this.add(latitudeInputField);
-        this.add(longtitudeInputField);
-        this.add(searchButton);
-
-        // enable/disable the search button depending on the text in the fields
-        latitudeInputField.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent event) {
-                String content = latitudeInputField.getText();
-                if (!content.equals("")) {
-                    searchButton.setEnabled(true);
-
-                } else {
-                    searchButton.setEnabled(false);
-
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (latitudeInputField.getText().equals("")){
+                    latitudeInputField.setText("Latitude");
                 }
             }
         });
+        longitudeInputField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if( longitudeInputField.getText().equals("Longitude") ) {
+                    longitudeInputField.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if( longitudeInputField.getText().equals("")) {
+                    longitudeInputField.setText("Longitude");
+                }
+            }
+        });
+
+        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        this.add(latitudeInputField);
+        this.add(longitudeInputField);
+        this.add(searchButton);
+
 
         /**
          * ActionListener on the searchButton that does sanitisation on the input
@@ -77,7 +90,8 @@ public class SearchPanel extends JPanel {
             float lat=0;
             @Override
             public void actionPerformed(ActionEvent event) {
-                if(latitudeInputField.getText().equals("")||longtitudeInputField.getText().equals("")){
+                if(latitudeInputField.getText().equals("")||longitudeInputField.getText().equals("")){
+                    //This shouldn't happen with the new dynamic areas
                     JOptionPane.showMessageDialog(null, "Please fill both fields");
                     return;
                 }
@@ -92,15 +106,16 @@ public class SearchPanel extends JPanel {
                         }
                         catch (NumberFormatException e2){
                             JOptionPane.showMessageDialog(null, "Not a valid coordinate");
-                            latitudeInputField.setText("");
+                            latitudeInputField.setText("Latitude");
+                            longitudeInputField.setText("Longitude");
                             return;
                         }
                     }
 
                 }
 
-                if(!longtitudeInputField.getText().equals("")){
-                    String longtS=longtitudeInputField.getText();
+                if(!longitudeInputField.getText().equals("")){
+                    String longtS=longitudeInputField.getText();
                     try{
                         longt=Float.parseFloat(longtS);
                     }
@@ -110,7 +125,8 @@ public class SearchPanel extends JPanel {
                         }
                         catch (NumberFormatException e2){
                             JOptionPane.showMessageDialog(null, "Not a valid coordinate");
-                            latitudeInputField.setText("");
+                            latitudeInputField.setText("Latitude");
+                            longitudeInputField.setText("Longitude");
                             return;
                         }
                     }
@@ -262,9 +278,5 @@ public class SearchPanel extends JPanel {
                 //MyFrame.getWindow().setVisible(true);
             }
         });
-
-
     }
-
-
 }
