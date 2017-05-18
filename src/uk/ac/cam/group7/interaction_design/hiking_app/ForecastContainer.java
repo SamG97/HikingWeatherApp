@@ -431,7 +431,6 @@ public class ForecastContainer {
             }
         }
 
-
         // Randomly generates more serious weather warning for now as a test since a suitable API could not be found
         Random rnd = new Random();
         rnd.setSeed(0L);
