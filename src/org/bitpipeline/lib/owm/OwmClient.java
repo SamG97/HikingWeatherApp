@@ -43,7 +43,7 @@ public class OwmClient {
 		TICK, HOUR, DAY 
 	}
 
-	private String baseOwmUrl = "http://api.openweathermap.org/data/2.1/";
+	private String baseOwmUrl = "http://api.openweathermap.org/data/2.5/";
 	private String owmAPPID = "d12c4a04b7d0170dff8f1afca1e4c0ff";
 
 	private HttpClient httpClient;
