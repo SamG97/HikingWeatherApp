@@ -1,0 +1,50 @@
+package uk.ac.cam.group7.interaction_design.hiking_app;
+
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+
+import javax.imageio.ImageIO;
+import javax.swing.JPanel;
+/* class for including icons of weather state in the main screen */
+public class MyIcon  extends JPanel {
+	 private static HashMap<String,BufferedImage> icons = new HashMap<String, BufferedImage>();
+	 private BufferedImage image;
+   @Override
+	    protected void paintComponent(Graphics g) {
+	        super.paintComponent(g);
+	        g.drawImage(image.getScaledInstance(40,30,20), 0, 0, this);         
+	    }
+
+	public MyIcon(String weatherStatus) throws IOException
+	{
+		this.setPreferredSize(new Dimension(40,30));
+		this.setMaximumSize(new Dimension(40,30));
+		this.setMinimumSize(new Dimension(40,30));
+		
+			if(icons.containsKey(weatherStatus)){
+				
+					image = icons.get(weatherStatus);
+			}
+			else
+			{
+				if(weatherStatus.equals("sunny"))	{					
+					try { image = ImageIO.read(new File("image path for the sunny icon"));
+					icons.put(weatherStatus, image);}
+					catch (IOException ex) {throw new IOException(); }
+				}
+				else				
+					if(weatherStatus.equals("cloudy"))	{					
+						try { image = ImageIO.read(new File("image path for the cloudy icon"));
+						icons.put(weatherStatus, image);}
+						catch (IOException ex) {throw new IOException(); }
+					}
+												
+		    }
+						
+	}
+
+}
