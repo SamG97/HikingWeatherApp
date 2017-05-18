@@ -196,7 +196,7 @@ public class ForecastContainer {
             JSONObject response = api.doQuery(subUrl);
             WeatherStatusResponse nearbyStation =  new WeatherStatusResponse(response);
             List<StatusWeatherData> forecast = nearbyStation.getWeatherStatus();
-            saveJson(Paths.get("data" + pSep + "recent" + pSep + latitude.toString() + "_" + longitude.toString()),response);
+            saveJson(Paths.get("data" + pSep + latitude.toString() + "_" + longitude.toString()),response);
             return forecast;
         } catch (IOException | JSONException e) {
             e.printStackTrace();
