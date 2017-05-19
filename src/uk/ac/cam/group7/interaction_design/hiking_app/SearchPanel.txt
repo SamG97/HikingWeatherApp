@@ -266,18 +266,17 @@ public class SearchPanel extends JPanel{
                 }, "GG");
                 */
                 //
-                if(locationStore.contains(curr)){
+                if(MainScreen.contains(currLoc)){
                     JOptionPane.showMessageDialog(null, "Can't duplicate loctations");
                     return;
                 }
-                locationStore.add(curr);
-                ForecastContainer.getReference().addNewLocation(curr);
-                MainScreen.addScrollField(new AddedLocation(curr));
-                MainScreen.getWindow().setVisible(true);
-
-                //MyFrame.addScrollField(new AddedLocation(message));
-                //MyFrame.getWindow().setVisible(true);
+                
+                MainScreen.addNewLocation(new AddedLocation(currLoc));
+                      
             }
         });
+
+
     }
+   
 }
