@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import org.bitpipeline.lib.owm.StatusWeatherData;
 import uk.ac.cam.group7.interaction_design.hiking_app.ForecastContainer;
@@ -16,6 +17,11 @@ import uk.ac.cam.group7.interaction_design.hiking_app.Location;
 import java.time.DayOfWeek;
 import java.util.*;
 
+/**
+ * Handles generating the forecast display and passes resulting scene back to MainMenu to be displayed
+ *
+ * @author Sam Gooch
+ */
 public class ForecastDisplay {
 
     private static ForecastContainer forecasts = ForecastContainer.getReference();
@@ -26,6 +32,12 @@ public class ForecastDisplay {
     private DayOfWeek currentDay;
     private List<StatusWeatherData> currentForecastToDisplay;
 
+    /**
+     * Constructor for ForecastDisplay
+     *
+     * @param location The location to display the forecast for
+     * @param main     Reference back to allow the menu to be drawn
+     */
     protected ForecastDisplay(Location location, MainMenu main) {
         this.location = location;
         this.dailyForecasts = ForecastFormatting.getDailyForecasts(forecasts.getForecast(location));
@@ -36,9 +48,22 @@ public class ForecastDisplay {
         } else {
             currentDay = ForecastFormatting.getToady();
             currentForecastToDisplay = dailyForecasts.get(currentDay);
+            if (currentForecastToDisplay == null) {
+                int tomorrow = currentDay.getValue() + 1;
+                if (tomorrow > 8) {
+                    tomorrow -= 7;
+                }
+                currentDay = DayOfWeek.of(tomorrow);
+                currentForecastToDisplay = dailyForecasts.get(currentDay);
+            }
         }
     }
 
+    /**
+     * Generates the forecast display screen for the location
+     *
+     * @return The forecast display screen
+     */
     protected Scene getWeatherDisplay() {
         VBox display = new VBox();
 
@@ -61,11 +86,13 @@ public class ForecastDisplay {
 
         if (currentForecastToDisplay == null) {
             Label noData = new Label();
-            noData.setText("There is no saved data for this location and we cannot access the web server");
+            noData.setText("There is no saved data for this location and we cannot access the web server!");
             noData.setAlignment(Pos.CENTER);
+            noData.setWrapText(true);
             Label helpMessage = new Label();
             helpMessage.setText("Please connect to the internet to view data for this location");
             helpMessage.setAlignment(Pos.CENTER);
+            helpMessage.setWrapText(true);
             display.getChildren().addAll(titleBar, noData, helpMessage);
         } else {
             GridPane forecasts = generateForecastScreen();
@@ -85,25 +112,35 @@ public class ForecastDisplay {
         return new Scene(display);
     }
 
+    /**
+     * Generates the grid of forecast data
+     *
+     * @return Formatted forecast data
+     */
     private GridPane generateForecastScreen() {
         GridPane display = new GridPane();
 
         Label timeHeader = new Label();
         timeHeader.setText("Time");
+        timeHeader.getStyleClass().set(0, "label-small");
         display.add(timeHeader, 0, 0);
         Label temperatureHeader = new Label();
+        temperatureHeader.getStyleClass().set(0, "label-small");
         temperatureHeader.setText("Temp");
         display.add(temperatureHeader, 1, 0);
-        Label typeHeader = new Label();
         Label precipitationHeader = new Label();
+        precipitationHeader.getStyleClass().set(0, "label-small");
         precipitationHeader.setText("Rain");
         display.add(precipitationHeader, 3, 0);
         Label windHeader = new Label();
+        windHeader.getStyleClass().set(0, "label-small");
         windHeader.setText("Wind");
         display.add(windHeader, 4, 0);
+        display.setColumnSpan(windHeader, 2);
         Label humidityHeader = new Label();
-        humidityHeader.setText("Hum");
-        display.add(humidityHeader, 5, 0);
+        humidityHeader.getStyleClass().set(0, "label-small");
+        humidityHeader.setText("Humidity");
+        display.add(humidityHeader, 6, 0);
 
         int row = 1;
         for (StatusWeatherData weather : currentForecastToDisplay) {
@@ -111,44 +148,64 @@ public class ForecastDisplay {
             time.setText(ForecastFormatting.getTimeLabel(weather.getDateTime()));
             display.add(time, 0, row);
             Label temperature = new Label();
-            temperature.setText(Integer.toString(ForecastFormatting.normaliseTemperature(weather.getTemp())));
+            temperature.setText(ForecastFormatting.normaliseTemperature(weather.getTemp()) + "\u00b0" + "C");
             display.add(temperature, 1, row);
-            Label type = new Label();
-            type.setText(weather.getWeatherConditions().get(0).getDescription());
+            ImageView type = WeatherIconConverter.getIconImage(weather.getWeatherConditions(), weather.getDateTime());
             display.add(type, 2, row);
             Label precipitation = new Label();
             if (weather.getRain() == Integer.MIN_VALUE) {
-                precipitation.setText("0");
+                precipitation.setText("0 mm");
             } else {
-                precipitation.setText(Integer.toString(weather.getRain()));
+                precipitation.setText(weather.getRain() + " mm");
             }
             display.add(precipitation, 3, row);
+
+            VBox windData = new VBox();
             Label wind = new Label();
             wind.setText(Double.toString(ForecastFormatting.convertWindSpeed(weather.getWindSpeed())));
-            display.add(wind, 4, row);
+            wind.getStyleClass().set(0, "label-small");
+            Label mph = new Label("mph");
+            mph.getStyleClass().set(0, "label-small");
+            windData.getChildren().addAll(wind, mph);
+            windData.setAlignment(Pos.CENTER);
+            display.add(windData, 4, row);
+
+            HBox windDirectionContainer = new HBox();
+            ImageView windDirection = WeatherIconConverter.getWindDirection(weather.getWindDeg());
+            windDirectionContainer.getChildren().addAll(windDirection);
+            windDirectionContainer.setAlignment(Pos.CENTER);
+            display.add(windDirectionContainer, 5, row);
+
             Label humidity = new Label();
-            humidity.setText(Float.toString(weather.getHumidity()));
-            display.add(humidity, 5, row);
+            humidity.setText(weather.getHumidity() + "%");
+            display.add(humidity, 6, row);
             row++;
         }
-        ColumnConstraints timeColumn = new ColumnConstraints(150,150,150);
+        ColumnConstraints timeColumn = new ColumnConstraints(150, 150, 150);
         timeColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints temperatureColumn = new ColumnConstraints(120,120,120);
+        ColumnConstraints temperatureColumn = new ColumnConstraints(120, 120, 120);
         temperatureColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints typeColumn = new ColumnConstraints(150,150,150);
+        ColumnConstraints typeColumn = new ColumnConstraints(150, 150, 150);
         typeColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints precipitationColumn = new ColumnConstraints(140,140,140);
+        ColumnConstraints precipitationColumn = new ColumnConstraints(140, 140, 140);
         precipitationColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints windColumn = new ColumnConstraints(150,150,150);
+        ColumnConstraints windColumn = new ColumnConstraints(80, 80, 80);
         windColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints humidityColumn = new ColumnConstraints(150,150,150);
+        ColumnConstraints windDirectionColumn = new ColumnConstraints(100, 100, 100);
+        windDirectionColumn.setHgrow(Priority.ALWAYS);
+        ColumnConstraints humidityColumn = new ColumnConstraints(180, 180, 180);
         humidityColumn.setHgrow(Priority.ALWAYS);
         display.getColumnConstraints().addAll(timeColumn, temperatureColumn, typeColumn, precipitationColumn,
-                windColumn, humidityColumn);
+                windColumn, windDirectionColumn, humidityColumn);
         return display;
     }
 
-    public HBox getDayMenu() {
+    /**
+     * Gets day select menu at bottom of the the screen
+     *
+     * @return Day select menu
+     */
+    private HBox getDayMenu() {
         Set<DayOfWeek> allDays = dailyForecasts.keySet();
         boolean breakFound = false;
         List<DayOfWeek> leftList = new LinkedList<>();
@@ -164,11 +221,10 @@ public class ForecastDisplay {
                 breakFound = true;
             }
         }
-        List<DayOfWeek> sortedDays = rightList;
-        sortedDays.addAll(leftList);
+        rightList.addAll(leftList);
 
         HBox days = new HBox();
-        for (DayOfWeek day : sortedDays) {
+        for (DayOfWeek day : rightList) {
             if (day == currentDay) {
                 continue;
             }
@@ -186,6 +242,9 @@ public class ForecastDisplay {
         return days;
     }
 
+    /**
+     * Toggles if a location is a favourite
+     */
     private void toggleFavourite() {
         if (location.isFavourite()) {
             forecasts.removeFavourite(location);
@@ -194,12 +253,20 @@ public class ForecastDisplay {
         }
     }
 
+    /**
+     * Changes the day to be displayed
+     *
+     * @param day The day to change to
+     */
     private void changeDay(DayOfWeek day) {
         currentDay = day;
         currentForecastToDisplay = dailyForecasts.get(day);
         main.drawScreen(getWeatherDisplay());
     }
 
+    /**
+     * Returns to the main menu
+     */
     private void returnHome() {
         main.returnHome();
     }

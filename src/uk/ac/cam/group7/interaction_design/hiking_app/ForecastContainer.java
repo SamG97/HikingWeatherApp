@@ -1,12 +1,10 @@
 package uk.ac.cam.group7.interaction_design.hiking_app;
 
-import jdk.net.SocketFlow;
 import org.bitpipeline.lib.owm.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,7 +20,6 @@ public class ForecastContainer {
 
     private final static ForecastContainer reference = new ForecastContainer();
 
-    private final static String pSep = "\\";
     private final static OwmClient api = new OwmClient();
     private final static List<List<WeatherData.WeatherCondition.ConditionCode>> weatherGroupings;
     private final static Map<Integer, String> severityDescriptor;
@@ -31,6 +28,7 @@ public class ForecastContainer {
     private List<Location> favouriteLocations;
     private List<Location> recentLocations;
 
+    // Disgusting code, don't judge the fact that I had to include this
     static {
         api.setAPPID("d12c4a04b7d0170dff8f1afca1e4c0ff");
 
@@ -124,7 +122,7 @@ public class ForecastContainer {
      */
     private ForecastContainer() {
         weatherDataMap = new HashMap<>();
-        favouriteLocations = importLocations(Paths.get("data" + pSep + "favourites.csv"));
+        favouriteLocations = importLocations(Paths.get("data/favourites.csv"));
         for (Location location : favouriteLocations) {
             List<StatusWeatherData> historicData = JsonIO.readJson(location.getPath());
             List<StatusWeatherData> currentData;
@@ -136,7 +134,7 @@ public class ForecastContainer {
             //generateWarnings(historicData, currentData, location);
             weatherDataMap.put(location, currentData);
         }
-        recentLocations = importLocations(Paths.get("data" + pSep + "recent.csv"));
+        recentLocations = importLocations(Paths.get("data/recent.csv"));
         for (Location location : recentLocations) {
             List<StatusWeatherData> historicData = JsonIO.readJson(location.getPath());
             List<StatusWeatherData> currentData;
@@ -247,6 +245,12 @@ public class ForecastContainer {
         saveLocations();
     }
 
+    /**
+     * Renames a location and saves the change
+     *
+     * @param location Location to update
+     * @param name     New name for the location
+     */
     public void renameLocation(Location location, String name) {
         location.setName(name);
         saveLocations();
@@ -256,8 +260,8 @@ public class ForecastContainer {
      * Saves location data
      */
     private void saveLocations() {
-        exportLocations(Paths.get("data" + pSep + "favourites.csv"), favouriteLocations);
-        exportLocations(Paths.get("data" + pSep + "recent.csv"), recentLocations);
+        exportLocations(Paths.get("data/favourites.csv"), favouriteLocations);
+        exportLocations(Paths.get("data/recent.csv"), recentLocations);
     }
 
     /**

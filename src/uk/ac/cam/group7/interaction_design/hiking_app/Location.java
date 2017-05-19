@@ -20,8 +20,11 @@ public class Location {
     private final Path path;
     private WarningsContainer warnings;
 
-    private final static String pSep = File.separator;
-
+    /**
+     * Copy constructor for location
+     *
+     * @param location Location to copy
+     */
     public Location(Location location) {
         this.latitude = location.latitude;
         this.longitude = location.longitude;
@@ -43,14 +46,14 @@ public class Location {
         this.longitude = longitude;
         this.name = latitude + ", " + longitude;
         this.isFavourite = false;
-        this.path = Paths.get("data" + pSep + hashCode() + ".json");
+        this.path = Paths.get("data/" + hashCode() + ".json");
         this.warnings = new WarningsContainer();
     }
 
     /**
      * Generates a filename for a location based on a hash of its latitude and longitude
      *
-     * @return The file name to use
+     * @return The hash code for the location
      */
     @Override
     public int hashCode() {

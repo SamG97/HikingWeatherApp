@@ -13,6 +13,11 @@ import javafx.scene.layout.VBox;
 import uk.ac.cam.group7.interaction_design.hiking_app.ForecastContainer;
 import uk.ac.cam.group7.interaction_design.hiking_app.Location;
 
+/**
+ * Handles generating the options menu and passes resulting scene back to MainMenu to be displayed
+ *
+ * @author Sam Gooch
+ */
 public class OptionsMenu {
 
     private ForecastContainer forecasts = ForecastContainer.getReference();
@@ -20,12 +25,23 @@ public class OptionsMenu {
     private MainMenu main;
     private boolean isFavourite;
 
+    /**
+     * Constructor for OptionsMenu
+     *
+     * @param location Location the menu is for
+     * @param main     Reference back to allow the menu to be drawn
+     */
     protected OptionsMenu(Location location, MainMenu main) {
         this.location = location;
         this.main = main;
         this.isFavourite = location.isFavourite();
     }
 
+    /**
+     * Generates the options menu for the location
+     *
+     * @return The options menu scene
+     */
     protected Scene generateOptionsMenu() {
         BorderPane border = new BorderPane();
 
@@ -117,6 +133,9 @@ public class OptionsMenu {
         return new Scene(border);
     }
 
+    /**
+     * Toggles if a location is a favourite
+     */
     private void toggleFavourite() {
         if (location.isFavourite()) {
             forecasts.removeFavourite(location);
@@ -125,19 +144,37 @@ public class OptionsMenu {
         }
     }
 
+    /**
+     * Brings up the delete confirmation prompt
+     *
+     * @param confirmLayout Reference to the confirmation prompt to display
+     */
     private void deletePrompt(VBox confirmLayout) {
         confirmLayout.setVisible(true);
     }
 
+    /**
+     * Deletes a location
+     */
     private void deleteLocation() {
         forecasts.removeLocation(location);
         main.returnHome();
     }
 
+    /**
+     * Removes the delete confirmation prompt if the user decides not to delete the location
+     *
+     * @param confirmLayout Reference to the confirmation prompt to display
+     */
     private void cancelDelete(VBox confirmLayout) {
         confirmLayout.setVisible(false);
     }
 
+    /**
+     * Returns to the main menu screen and saves changes
+     *
+     * @param name New name of location to update
+     */
     private void returnHome(String name) {
         if (!name.equals(location.getName())) {
             forecasts.renameLocation(location, name);
@@ -145,6 +182,12 @@ public class OptionsMenu {
         main.returnHome();
     }
 
+    /**
+     * Reverts changes
+     *
+     * @param locationName TextField containing location name to reset value of
+     * @param favourite    Favourite button
+     */
     private void undoChanges(TextField locationName, ToggleButton favourite) {
         locationName.setText(location.getName());
         if (!favourite.isSelected() == isFavourite) {

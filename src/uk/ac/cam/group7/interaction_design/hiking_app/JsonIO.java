@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Reads and writes JSON files to disk
  *
- * @author Dávid
+ * @author Dávid, Sam Gooch
  */
 public class JsonIO {
 
@@ -23,7 +23,7 @@ public class JsonIO {
      * @param path The path to the file on disk
      * @return List<StatusWeatherData> The forecast stored in the file
      */
-    public static List<StatusWeatherData> readJson(Path path) {
+    protected static List<StatusWeatherData> readJson(Path path) {
         String read;
         JSONObject json = new JSONObject();
         try {
@@ -55,7 +55,7 @@ public class JsonIO {
      * @param path The path to the file on disk to write to
      * @param data The JSON file to save
      */
-    public static void saveJson(Path path, JSONObject data) {
+    protected static void saveJson(Path path, JSONObject data) {
         ObjectOutputStream outputStream;
         try {
             BufferedWriter w = Files.newBufferedWriter(path);

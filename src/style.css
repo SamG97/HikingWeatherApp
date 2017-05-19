@@ -47,13 +47,16 @@
     -fx-background-color: transparent;
 }
 
+.label-small {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-font-size: 3em;
+    -fx-text-fill: #4f484d;
+    -fx-background-color: transparent;
+}
+
 .text-field {
     -fx-font-family:"Segoe UI", Helvetica, Arial, sans-serif;
     -fx-font-size: 4em;
-}
-
-.scroll-pane {
-    -fx-background-color: darkgreen;
 }
 
 .toggle-button {
