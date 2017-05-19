@@ -15,7 +15,7 @@ import javax.swing.border.EtchedBorder;
  */
 class MainScreen  {
 	
-   private static ForecastContainer sForecastContainer= new ForecastContainer();
+   private static ForecastContainer sForecastContainer=ForecastContainer.getReference();
    
     /** Specify the look and feel to use by defining the LOOKANDFEEL constant */
    
@@ -86,7 +86,7 @@ class MainScreen  {
     {
         sMainPanel.add(input);  
         sWindow.setVisible(true);
-        sForecastContainer.addToRecent(input.getLoc());
+        sForecastContainer.addNewLocation(input.getLoc());
     }
   
     

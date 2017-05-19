@@ -127,7 +127,7 @@ public class ForecastContainer {
         for (Location location : favouriteLocations) {
             List<StatusWeatherData> historicData = JsonIO.readJson(location.getPath());
             List<StatusWeatherData> currentData;
-            if (historicData.get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800) { //Data older than half an hour
+            if (!(api == null) && historicData.get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800) { //Data older than half an hour
                 currentData = getAPIResponse(location.getLatitude(), location.getLongitude(), location.getPath());
             } else {
                 currentData = historicData;
@@ -139,7 +139,7 @@ public class ForecastContainer {
         for (Location location : recentLocations) {
             List<StatusWeatherData> historicData = JsonIO.readJson(location.getPath());
             List<StatusWeatherData> currentData;
-            if (historicData.get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800) { //Data older than half an hour
+            if (!(api == null) && historicData.get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800) { //Data older than half an hour
                 currentData = getAPIResponse(location.getLatitude(), location.getLongitude(), location.getPath());
             } else {
                 currentData = historicData;
@@ -180,7 +180,7 @@ public class ForecastContainer {
             }
             addToRecent(location);
         }
-        if (weatherDataMap.get(location).get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800) {
+        if (!(api == null) && weatherDataMap.get(location).get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800) {
             weatherDataMap.put(location, getAPIResponse(location.getLatitude(), location.getLongitude(),
                     location.getPath()));
         }
@@ -276,6 +276,7 @@ public class ForecastContainer {
         try {
             String subUrl = String.format(Locale.ROOT, "forecast?lat=%f&lon=%f&",
                     latitude, longitude);
+            System.out.println(subUrl);
             JSONObject response = api.doQuery(subUrl);
             WeatherStatusResponse nearbyStation = new WeatherStatusResponse(response);
             List<StatusWeatherData> forecast = nearbyStation.getWeatherStatus();
@@ -312,8 +313,9 @@ public class ForecastContainer {
                                     data[i++]), Integer.parseInt(data[i]));
                 }
                 locationsList.add(new Location(latitude, longitude, isFavourite, locationPath, name, warnings));
-                r.readLine();
+                line = r.readLine();
             }
+            r.close();
         } catch (IOException e) {
             try {
                 Files.createFile(path);
@@ -374,6 +376,7 @@ public class ForecastContainer {
                 line.append("\n");
                 w.write(line.toString());
             }
+            w.close();
         } catch (IOException e) {
             throw new RuntimeException("File system improperly configured");
         }

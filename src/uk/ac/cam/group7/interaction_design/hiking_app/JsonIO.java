@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -57,11 +58,10 @@ public class JsonIO {
     public static void saveJson(Path path, JSONObject data) {
         ObjectOutputStream outputStream;
         try {
-            File beingWritten = new File(path.toString());
-            outputStream = new ObjectOutputStream(new FileOutputStream(beingWritten));
-            outputStream.writeObject(data.toString());
-            outputStream.flush();
-            outputStream.close();
+            BufferedWriter w = Files.newBufferedWriter(path);
+            w.write(data.toString());
+            w.flush();
+            w.close();
         } catch (IOException e) {
             System.err.println("Error: " + e);
         }

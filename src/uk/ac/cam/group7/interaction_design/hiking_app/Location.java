@@ -32,9 +32,8 @@ public class Location {
     public Location(float latitude, float longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.name = latitude + ", " + longitude;
+        this.name = latitude + "; " + longitude;
         this.isFavourite = false;
-        System.out.println("data" + pSep + generateFileName() + ".json");
         this.path = Paths.get("data" + pSep + generateFileName() + ".json");
         this.warnings = new WarningsContainer();
     }
