@@ -26,7 +26,7 @@ public class AddedLocation extends JPanel {
         this.setOpaque(false);
         this.setMaximumSize(new Dimension(750,40));
 
-        JLabel locName= new JLabel(currLoc.toString(),JLabel.CENTER);
+        locName= new JLabel(currLoc.toString(),JLabel.CENTER);
         locName.setFont(new Font("Courier New", Font.BOLD, 26));
        locName.setMinimumSize(new Dimension(260,40));
         locName.setPreferredSize(new Dimension(260,40));
@@ -48,9 +48,20 @@ public class AddedLocation extends JPanel {
                OptionsMenu.createToday(test);
             }
         });
+        ForecastContainer sForecastContainer=ForecastContainer.getReference();
+        List<StatusWeatherData> weatherOfDays = sForecastContainer.getForecast(currLoc);
+        float todayWeather = weatherOfDays.get(0).getTemp();
+      
+        
+        JLabel temp= new JLabel(currLoc.toString(),JLabel.CENTER);
+        temp.setFont(new Font("Courier New", Font.BOLD, 26));
+        temp.setMinimumSize(new Dimension(100,40));
+        temp.setPreferredSize(new Dimension(100,40));
+        temp.setMaximumSize(new Dimension(100,40));
+        temp.setForeground(Color.DARK_GRAY);
+        temp.setText(Float.toString(todayWeather));
 	    
-	    
-	 JPanel icon;
+	/* JPanel icon;
        try{
     	   icon = new MyIcon("to be implemented");
        } catch (IOException e) {
@@ -59,14 +70,20 @@ public class AddedLocation extends JPanel {
     	   icon.setMaximumSize(new Dimension(40,30));
     	   icon.setMinimumSize(new Dimension(40,30));
     	   
-       }
+       }*/
+        JPanel icon = new JPanel();
+        icon.setPreferredSize(new Dimension(40,30));
+ 	   icon.setMaximumSize(new Dimension(40,30));
+ 	   icon.setMinimumSize(new Dimension(40,30));
+ 	   
 
          this.add(opt);
         this.add(Box.createRigidArea(new Dimension(25,0)));
         this.add(locName);
         this.add(Box.createRigidArea(new Dimension(150,0)));
         this.add(icon);
-
+        this.add(Box.createRigidArea(new Dimension(20,0)));
+this.add(temp);
 
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         this.setAlignmentX(Component.LEFT_ALIGNMENT);
