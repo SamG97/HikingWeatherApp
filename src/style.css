@@ -33,13 +33,6 @@
     -fx-background-color: transparent;
 }
 
-.grid {
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
-    -fx-background-radius: 0;
-    -fx-background-color: transparent;
-}
-
 .label {
     -fx-font-family:"Segoe UI", Helvetica, Arial, sans-serif;
     -fx-font-size: 4em;

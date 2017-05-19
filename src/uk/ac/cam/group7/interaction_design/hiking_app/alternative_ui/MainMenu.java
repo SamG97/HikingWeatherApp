@@ -102,21 +102,38 @@ public class MainMenu extends Application {
         invalidCoordinates.setVisible(false);
 
         VBox locations = new VBox();
-        Label favourites = new Label("Favourites");
-        favourites.getStyleClass().set(0, "label-small");
-        GridPane favouriteLocations = generateLocationList(new LinkedList<>(forecasts.getFavourites()));
-        favouriteLocations.getStyleClass().add("grid");
-        Label recent = new Label("Recent Locations");
-        recent.getStyleClass().set(0, "label-small");
-        GridPane recentLocations = generateLocationList(new LinkedList<>(forecasts.getRecent()));
-        recentLocations.getStyleClass().add("grid");
-        locations.getChildren().addAll(favourites, favouriteLocations, recent, recentLocations);
+        if (forecasts.getFavourites().size() > 0) {
+            Label favourites = new Label("Favourites");
+            favourites.getStyleClass().set(0, "label-small");
+            GridPane favouriteLocations = generateLocationList(new LinkedList<>(forecasts.getFavourites()));
+            locations.getChildren().addAll(favourites, favouriteLocations);
+        }
+        if (forecasts.getRecent().size() > 0) {
+            Label recent = new Label("Recent Locations");
+            recent.getStyleClass().set(0, "label-small");
+            GridPane recentLocations = generateLocationList(new LinkedList<>(forecasts.getRecent()));
+            locations.getChildren().addAll(recent, recentLocations);
+        }
+        if (forecasts.getFavourites().size() == 0 && forecasts.getRecent().size() == 0) {
+            VBox instructionContainer = new VBox();
+            Label startInstructions1 = new Label();
+            startInstructions1.setText("You don't have any saved locations yet!");
+            startInstructions1.getStyleClass().set(0, "label-small");
+            startInstructions1.setWrapText(true);
+            Label startInstructions2 = new Label();
+            startInstructions2.setText("Enter some co-ordinates to get started!");
+            startInstructions2.getStyleClass().set(0, "label-small");
+            startInstructions2.setWrapText(true);
+            instructionContainer.getChildren().addAll(startInstructions1, startInstructions2);
+            instructionContainer.setAlignment(Pos.CENTER);
+            listContainer.getChildren().addAll(searchBar, invalidCoordinates, instructionContainer);
+        } else {
+            ScrollPane scroll = new ScrollPane(locations);
+            scroll.setFitToHeight(true);
+            scroll.setFitToWidth(true);
 
-        ScrollPane scroll = new ScrollPane(locations);
-        scroll.setFitToHeight(true);
-        scroll.setFitToWidth(true);
-
-        listContainer.getChildren().addAll(searchBar, invalidCoordinates, scroll);
+            listContainer.getChildren().addAll(searchBar, invalidCoordinates, scroll);
+        }
         listContainer.setAlignment(Pos.TOP_CENTER);
 
         confirm.setOnAction(event -> searchForLocation(latitude, longitude, invalidCoordinates));

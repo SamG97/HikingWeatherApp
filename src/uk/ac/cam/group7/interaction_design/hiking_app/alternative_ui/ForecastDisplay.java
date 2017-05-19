@@ -88,10 +88,12 @@ public class ForecastDisplay {
             Label noData = new Label();
             noData.setText("There is no saved data for this location and we cannot access the web server!");
             noData.setAlignment(Pos.CENTER);
+            noData.getStyleClass().set(0, "label-small");
             noData.setWrapText(true);
             Label helpMessage = new Label();
             helpMessage.setText("Please connect to the internet to view data for this location");
             helpMessage.setAlignment(Pos.CENTER);
+            helpMessage.getStyleClass().set(0, "label-small");
             helpMessage.setWrapText(true);
             display.getChildren().addAll(titleBar, noData, helpMessage);
         } else {
