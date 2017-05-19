@@ -597,5 +597,6 @@ public class WeatherData extends AbstractWeatherData {
 		if (hasSnow ())
 			precipitation = precipitation != Integer.MIN_VALUE ? precipitation + getSnow () : getSnow ();
 		return precipitation;
+
 	}
 }
