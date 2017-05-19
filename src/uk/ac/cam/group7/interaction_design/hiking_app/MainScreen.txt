@@ -1,19 +1,26 @@
 package uk.ac.cam.group7.interaction_design.hiking_app;
 
+package uk.ac.cam.interactiondesign;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
+import uk.ac.cam.group7.interaction_design.hiking_app.ForecastContainer;
+import uk.ac.cam.group7.interaction_design.hiking_app.Location;
+
 /**
  * This is the main screen that will have search menus etc
  * @author Alex
  */
-class MainScreen  {
+public class MainScreen  {
 	
    private static ForecastContainer sForecastContainer=ForecastContainer.getReference();
    
@@ -84,9 +91,11 @@ class MainScreen  {
      */
     public static void addNewLocation(AddedLocation input)
     {
+    
         sMainPanel.add(input);  
+   	 sForecastContainer.addNewLocation(input.getLoc());
         sWindow.setVisible(true);
-        sForecastContainer.addNewLocation(input.getLoc());
+       
     }
   
     
@@ -94,15 +103,26 @@ class MainScreen  {
     * to be called when an update session is done 
     */
     
-    public static void refreshMain()
+    private static void refreshMain()
     {
+    	
+    	List<Location> savedLoc = new LinkedList<Location>();
+    	List<Location> container = sForecastContainer.getRecent();
+    	for(int i =0;i< sForecastContainer.getRecent().size();i++)
+    		savedLoc.add(new Location(container.get(i).getLatitude()
+    				,container.get(i).getLongitude()));
+    	System.out.println(savedLoc);
+    		
     	 
-        for(Location recentloc: sForecastContainer.getRecent())
+       for(Location recentloc: savedLoc)
         {
-        	sMainPanel.add(new AddedLocation(recentloc));
+    	   
+        	sMainPanel.add(new AddedLocation(recentloc));      
         }
         sWindow.setVisible(true);
+        
     }
+    
     
     /**
      * Add a border to a component
@@ -153,7 +173,7 @@ class MainScreen  {
     }
 
 
-    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException  {
 
     		UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
