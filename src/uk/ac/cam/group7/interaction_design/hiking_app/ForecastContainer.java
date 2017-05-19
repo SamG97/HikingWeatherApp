@@ -284,7 +284,6 @@ public class ForecastContainer {
         try {
             String subUrl = String.format(Locale.ROOT, "forecast?lat=%f&lon=%f&",
                     latitude, longitude);
-            System.out.println(subUrl);
             JSONObject response = api.doQuery(subUrl);
             WeatherStatusResponse nearbyStation = new WeatherStatusResponse(response);
             List<StatusWeatherData> forecast = nearbyStation.getWeatherStatus();
@@ -310,6 +309,16 @@ public class ForecastContainer {
             while (!(line == null)) {
                 String[] data = line.split(",");
                 String name = data[0];
+                if (name.contains(";")) {
+                    String[] parts = name.split(";");
+                    StringBuilder newName = new StringBuilder();
+                    for (String part : parts) {
+                        newName.append(part);
+                        newName.append(",");
+                    }
+                    newName.deleteCharAt(newName.length() - 1);
+                    name = newName.toString();
+                }
                 float latitude = Float.parseFloat(data[1]);
                 float longitude = Float.parseFloat(data[2]);
                 boolean isFavourite = Boolean.parseBoolean(data[3]);
@@ -348,7 +357,18 @@ public class ForecastContainer {
                     continue;
                 }
                 StringBuilder line = new StringBuilder();
-                line.append(location.getName());
+                String name = location.getName();
+                if (name.contains(",")) {
+                    String[] parts = name.split(",");
+                    StringBuilder newName = new StringBuilder();
+                    for (String part : parts) {
+                        newName.append(part);
+                        newName.append(";");
+                    }
+                    newName.deleteCharAt(newName.length() - 1);
+                    name = newName.toString();
+                }
+                line.append(name);
                 line.append(",");
                 line.append(location.getLatitude());
                 line.append(",");

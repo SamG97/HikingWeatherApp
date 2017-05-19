@@ -42,6 +42,7 @@ public class MainMenu extends Application {
     }
 
     protected void drawScreen(Scene scene) {
+        scene.getStylesheets().add("style.css");
         window.setScene(scene);
         window.setHeight(900);
         window.setWidth(700);
@@ -56,7 +57,10 @@ public class MainMenu extends Application {
         latitude.setPromptText("Latitude");
         TextField longitude = new TextField();
         longitude.setPromptText("Longitude");
-        Button confirm = new Button("Search");
+        Button confirm = new Button("Go");
+        latitude.setPrefWidth(300);
+        longitude.setPrefWidth(300);
+        confirm.setPrefWidth(100);
 
         searchBar.getChildren().addAll(latitude, longitude, confirm);
         searchBar.setHgrow(latitude, Priority.ALWAYS);
@@ -64,10 +68,18 @@ public class MainMenu extends Application {
         searchBar.setHgrow(confirm, Priority.ALWAYS);
 
         Label invalidCoordinates = new Label();
+        invalidCoordinates.setStyle("-fx-font-size: 3em;");
         invalidCoordinates.setVisible(false);
 
-        GridPane locationList = generateLocationList();
-        ScrollPane scroll = new ScrollPane(locationList);
+        VBox locations = new VBox();
+        GridPane favouriteLocations = generateLocationList(forecasts.getFavourites());
+        favouriteLocations.getStyleClass().add("grid");
+
+        GridPane recentLocations = generateLocationList(forecasts.getRecent());
+        recentLocations.getStyleClass().add("grid");
+        locations.getChildren().addAll(favouriteLocations, recentLocations);
+
+        ScrollPane scroll = new ScrollPane(locations);
         scroll.setFitToHeight(true);
         scroll.setFitToWidth(true);
 
@@ -95,14 +107,14 @@ public class MainMenu extends Application {
         try {
             lat = Float.parseFloat(latitude.getText());
         } catch (NumberFormatException e) {
-            errorOutput.setText("Please enter a numerical value for latitude");
+            errorOutput.setText("Please enter latitude using digits");
             errorOutput.setVisible(true);
             return;
         }
         try{
             lon = Float.parseFloat(longitude.getText());
         } catch (NumberFormatException e) {
-            errorOutput.setText("Please enter a numerical value for longitude");
+            errorOutput.setText("Please enter longitude using digits");
             errorOutput.setVisible(true);
             return;
         }
@@ -121,13 +133,13 @@ public class MainMenu extends Application {
         }
     }
 
-    private GridPane generateLocationList() {
+    private GridPane generateLocationList(List<Location> locationList) {
         GridPane display = new GridPane();
         int row = 0;
-        List<Location> allLocations = new LinkedList<>(forecasts.getFavourites());
-        allLocations.addAll(forecasts.getRecent());
-        for (Location location : allLocations) {
-            Button options = new Button("!");
+        for (Location location : locationList) {
+            Button options = new Button();
+            options.getStyleClass().add("options");
+            options.setPrefWidth(65);
             options.setOnAction(event -> makeOptionsMenu(location));
             display.add(options, 0, row);
             Button name = new Button(location.getName());
@@ -145,13 +157,13 @@ public class MainMenu extends Application {
             display.add(weather, 3, row);
             row++;
         }
-        ColumnConstraints optionsColumn = new ColumnConstraints(25,25,25);
+        ColumnConstraints optionsColumn = new ColumnConstraints(65,65,65);
         optionsColumn.setHgrow(Priority.ALWAYS);
         ColumnConstraints nameColumn = new ColumnConstraints(20,600,700);
         nameColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints temperatureColumn = new ColumnConstraints(10,30,500);
+        ColumnConstraints temperatureColumn = new ColumnConstraints(10,150,500);
         temperatureColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints conditionsColumn = new ColumnConstraints(10,50,500);
+        ColumnConstraints conditionsColumn = new ColumnConstraints(10,150,500);
         conditionsColumn.setHgrow(Priority.ALWAYS);
         display.getColumnConstraints().addAll(optionsColumn, nameColumn, temperatureColumn, conditionsColumn);
         return display;

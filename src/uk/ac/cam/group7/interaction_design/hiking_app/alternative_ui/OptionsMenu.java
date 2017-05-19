@@ -1,9 +1,12 @@
 package uk.ac.cam.group7.interaction_design.hiking_app.alternative_ui;
 
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -24,6 +27,8 @@ public class OptionsMenu {
     }
 
     protected Scene generateOptionsMenu() {
+        BorderPane border = new BorderPane();
+
         VBox container = new VBox();
 
         HBox topBar = new HBox();
@@ -32,74 +37,90 @@ public class OptionsMenu {
         locationName.setText(location.getName());
         Button home = new Button();
         home.setText("<");
-        Button favourite = new Button();
-        if (location.isFavourite()) {
-            favourite.setText("UnF");
-        } else {
-            favourite.setText("Fav");
-        }
+        ToggleButton favourite = new ToggleButton();
+        favourite.setSelected(location.isFavourite());
         topBar.getChildren().addAll(locationName, home, favourite);
 
         topBar.setHgrow(locationName, Priority.ALWAYS);
+        locationName.setPrefWidth(500);
         topBar.setHgrow(home, Priority.ALWAYS);
+        home.setPrefWidth(100);
         topBar.setHgrow(favourite, Priority.ALWAYS);
+        favourite.setPrefWidth(65);
 
         HBox coordinatesBar = new HBox();
         Label latitude = new Label("Latitude: " + location.getLatitude());
         latitude.setPrefWidth(500);
+        latitude.setAlignment(Pos.CENTER);
+        latitude.setStyle("-fx-font-size: 3em;");
         Label longitude = new Label("Longitude: " + location.getLongitude());
         longitude.setPrefWidth(500);
+        longitude.setAlignment(Pos.CENTER);
+        longitude.setStyle("-fx-font-size: 3em;");
         coordinatesBar.getChildren().addAll(latitude, longitude);
+        coordinatesBar.setAlignment(Pos.CENTER);
 
         coordinatesBar.setHgrow(latitude, Priority.ALWAYS);
         coordinatesBar.setHgrow(longitude, Priority.ALWAYS);
 
         Button delete = new Button();
         delete.setText("Delete location");
+        delete.getStyleClass().add("warning-button");
         delete.setPrefWidth(700);
 
         VBox deletePrompt = new VBox();
 
-        Label confirmPrompt = new Label();
-        confirmPrompt.setText("This will permanently delete this location, are you sure you want to delete?");
+        Label confirmPrompt1 = new Label();
+        Label confirmPrompt2 = new Label();
+        Label confirmPrompt3 = new Label();
+        confirmPrompt1.setText("This will permanently delete");
+        confirmPrompt2.setText("this location, are you sure you");
+        confirmPrompt3.setText("want to continue?");
+        confirmPrompt1.getStyleClass().set(0, "warning-text");
+        confirmPrompt2.getStyleClass().set(0, "warning-text");
+        confirmPrompt3.getStyleClass().set(0, "warning-text");
 
         HBox confirmContainer = new HBox();
         Button yes = new Button();
         yes.setText("I'm sure");
         yes.setPrefWidth(500);
+        yes.getStyleClass().add("warning-button");
         Button no = new Button();
         no.setText("Don't delete");
         no.setPrefWidth(500);
+        no.getStyleClass().add("warning-button");
         confirmContainer.getChildren().addAll(yes, no);
 
         confirmContainer.setHgrow(yes, Priority.ALWAYS);
         confirmContainer.setHgrow(no, Priority.ALWAYS);
 
-        deletePrompt.getChildren().addAll(confirmPrompt, confirmContainer);
+        deletePrompt.getChildren().addAll(confirmPrompt1, confirmPrompt2, confirmPrompt3, confirmContainer);
+        deletePrompt.setAlignment(Pos.CENTER);
         deletePrompt.setVisible(false);
 
-        Button cancel = new Button();
-        cancel.setText("Cancel without saving");
-        cancel.setPrefWidth(700);
+        Button undo = new Button();
+        undo.setText("Undo Changes");
+        undo.setPrefWidth(700);
 
-        container.getChildren().addAll(topBar, coordinatesBar, delete, deletePrompt, cancel);
+        container.getChildren().addAll(topBar, coordinatesBar, delete, deletePrompt);
+
+        border.setCenter(container);
+        border.setBottom(undo);
 
         home.setOnAction(event -> returnHome(locationName.getText()));
-        favourite.setOnAction(event -> toggleFavourite(favourite));
+        favourite.setOnAction(event -> toggleFavourite());
         delete.setOnAction(event -> deletePrompt(deletePrompt));
         yes.setOnAction(event -> deleteLocation());
         no.setOnAction(event -> cancelDelete(deletePrompt));
-        cancel.setOnAction(event -> exitNoSave());
+        undo.setOnAction(event -> undoChanges(locationName, favourite));
 
-        return new Scene(container);
+        return new Scene(border);
     }
 
-    private void toggleFavourite(Button favourite) {
+    private void toggleFavourite() {
         if (location.isFavourite()) {
-            favourite.setText("Fav");
             forecasts.removeFavourite(location);
         } else {
-            favourite.setText("UnF");
             forecasts.makeFavourite(location);
         }
     }
@@ -124,15 +145,12 @@ public class OptionsMenu {
         main.returnHome();
     }
 
-    private void exitNoSave() {
-        if (!isFavourite == location.isFavourite()) {
-            if (isFavourite) {
-                forecasts.makeFavourite(location);
-            } else {
-                forecasts.removeFavourite(location);
-            }
+    private void undoChanges(TextField locationName, ToggleButton favourite) {
+        locationName.setText(location.getName());
+        if (!favourite.isSelected() == isFavourite) {
+            toggleFavourite();
+            favourite.setSelected(location.isFavourite());
         }
-        main.returnHome();
     }
 
 }

@@ -41,7 +41,7 @@ public class Location {
     public Location(float latitude, float longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.name = latitude + "; " + longitude;
+        this.name = latitude + ", " + longitude;
         this.isFavourite = false;
         this.path = Paths.get("data" + pSep + hashCode() + ".json");
         this.warnings = new WarningsContainer();

@@ -12,6 +12,18 @@ import java.util.*;
  */
 public class ForecastFormatting {
 
+    static Map<DayOfWeek, String> dayMap = new HashMap<>();
+
+    static {
+        dayMap.put(DayOfWeek.MONDAY, "Mon");
+        dayMap.put(DayOfWeek.TUESDAY, "Tues");
+        dayMap.put(DayOfWeek.WEDNESDAY, "Wed");
+        dayMap.put(DayOfWeek.THURSDAY, "Thur");
+        dayMap.put(DayOfWeek.FRIDAY, "Fri");
+        dayMap.put(DayOfWeek.SATURDAY, "Sat");
+        dayMap.put(DayOfWeek.SUNDAY, "Sun");
+    }
+
     /**
      * Sorts the forecast into daily forecasts
      *
@@ -64,6 +76,10 @@ public class ForecastFormatting {
             today = 7;
         }
         return DayOfWeek.of(today);
+    }
+
+    public static String dayAlias(DayOfWeek day) {
+        return dayMap.get(day);
     }
 
 }

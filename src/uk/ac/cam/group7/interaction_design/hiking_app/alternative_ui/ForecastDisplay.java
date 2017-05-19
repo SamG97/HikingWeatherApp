@@ -1,12 +1,13 @@
 package uk.ac.cam.group7.interaction_design.hiking_app.alternative_ui;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.*;
-import javafx.scene.text.TextAlignment;
 import org.bitpipeline.lib.owm.StatusWeatherData;
 import uk.ac.cam.group7.interaction_design.hiking_app.ForecastContainer;
 import uk.ac.cam.group7.interaction_design.hiking_app.ForecastFormatting;
@@ -29,9 +30,13 @@ public class ForecastDisplay {
         this.location = location;
         this.dailyForecasts = ForecastFormatting.getDailyForecasts(forecasts.getForecast(location));
         this.main = main;
-        Calendar calendar = Calendar.getInstance();
-        currentDay = ForecastFormatting.getToady();
-        currentForecastToDisplay = dailyForecasts.get(currentDay);
+        if (dailyForecasts == null) {
+            currentDay = null;
+            currentForecastToDisplay = null;
+        } else {
+            currentDay = ForecastFormatting.getToady();
+            currentForecastToDisplay = dailyForecasts.get(currentDay);
+        }
     }
 
     protected Scene getWeatherDisplay() {
@@ -39,34 +44,43 @@ public class ForecastDisplay {
 
         HBox titleBar = new HBox();
         Label locationName = new Label();
-        locationName.setText(location.getName());
+        locationName.setText(ForecastFormatting.dayAlias(currentDay) + " - " + location.getName());
+        locationName.setAlignment(Pos.CENTER_LEFT);
         Button home = new Button();
         home.setText("<");
-        Button favourite = new Button();
-        if (location.isFavourite()) {
-            favourite.setText("UnF");
-        } else {
-            favourite.setText("Fav");
-        }
+        ToggleButton favourite = new ToggleButton();
+        favourite.setSelected(location.isFavourite());
         titleBar.getChildren().addAll(locationName, home, favourite);
         titleBar.setHgrow(locationName, Priority.ALWAYS);
-        locationName.setPrefWidth(600);
+        locationName.setPrefWidth(500);
         titleBar.setHgrow(home, Priority.ALWAYS);
-        home.setPrefWidth(50);
+        home.setPrefWidth(100);
         titleBar.setHgrow(favourite, Priority.ALWAYS);
-        favourite.setPrefWidth(50);
+        favourite.setPrefWidth(65);
+        favourite.setAlignment(Pos.TOP_RIGHT);
 
-        GridPane forecasts = generateForecastScreen();
-        ScrollPane scroll = new ScrollPane(forecasts);
-        scroll.setFitToHeight(true);
-        scroll.setFitToWidth(true);
+        if (currentForecastToDisplay == null) {
+            Label noData = new Label();
+            noData.setText("There is no saved data for this location and we cannot access the web server");
+            noData.setAlignment(Pos.CENTER);
+            Label helpMessage = new Label();
+            helpMessage.setText("Please connect to the internet to view data for this location");
+            helpMessage.setAlignment(Pos.CENTER);
+            display.getChildren().addAll(titleBar, noData, helpMessage);
+        } else {
+            GridPane forecasts = generateForecastScreen();
+            ScrollPane scroll = new ScrollPane(forecasts);
+            scroll.setFitToHeight(true);
+            scroll.setFitToWidth(true);
+            scroll.setPrefViewportHeight(800);
 
-        HBox days = getDayMenu();
+            HBox days = getDayMenu();
 
-        display.getChildren().addAll(titleBar, scroll, days);
+            display.getChildren().addAll(titleBar, scroll, days);
+        }
 
         home.setOnAction(event -> returnHome());
-        favourite.setOnAction(event -> toggleFavourite(favourite));
+        favourite.setOnAction(event -> toggleFavourite());
 
         return new Scene(display);
     }
@@ -78,19 +92,17 @@ public class ForecastDisplay {
         timeHeader.setText("Time");
         display.add(timeHeader, 0, 0);
         Label temperatureHeader = new Label();
-        temperatureHeader.setText("Temperature / C");
+        temperatureHeader.setText("Temp");
         display.add(temperatureHeader, 1, 0);
         Label typeHeader = new Label();
-        typeHeader.setText("Conditions");
-        display.add(typeHeader, 2, 0);
         Label precipitationHeader = new Label();
-        precipitationHeader.setText("Precipitation / mm");
+        precipitationHeader.setText("Rain");
         display.add(precipitationHeader, 3, 0);
         Label windHeader = new Label();
-        windHeader.setText("Wind / mph");
+        windHeader.setText("Wind");
         display.add(windHeader, 4, 0);
         Label humidityHeader = new Label();
-        humidityHeader.setText("Humidity / %");
+        humidityHeader.setText("Hum");
         display.add(humidityHeader, 5, 0);
 
         int row = 1;
@@ -119,17 +131,17 @@ public class ForecastDisplay {
             display.add(humidity, 5, row);
             row++;
         }
-        ColumnConstraints timeColumn = new ColumnConstraints(50,50,50);
+        ColumnConstraints timeColumn = new ColumnConstraints(150,150,150);
         timeColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints temperatureColumn = new ColumnConstraints(100,100,100);
+        ColumnConstraints temperatureColumn = new ColumnConstraints(120,120,120);
         temperatureColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints typeColumn = new ColumnConstraints(50,50,50);
+        ColumnConstraints typeColumn = new ColumnConstraints(150,150,150);
         typeColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints precipitationColumn = new ColumnConstraints(100,100,100);
+        ColumnConstraints precipitationColumn = new ColumnConstraints(140,140,140);
         precipitationColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints windColumn = new ColumnConstraints(100,100,100);
+        ColumnConstraints windColumn = new ColumnConstraints(150,150,150);
         windColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints humidityColumn = new ColumnConstraints(100,100,100);
+        ColumnConstraints humidityColumn = new ColumnConstraints(150,150,150);
         humidityColumn.setHgrow(Priority.ALWAYS);
         display.getColumnConstraints().addAll(timeColumn, temperatureColumn, typeColumn, precipitationColumn,
                 windColumn, humidityColumn);
@@ -161,7 +173,7 @@ public class ForecastDisplay {
                 continue;
             }
             Button dayButton = new Button();
-            dayButton.setText(day.toString());
+            dayButton.setText(ForecastFormatting.dayAlias(day));
             dayButton.setPrefWidth(200);
             dayButton.setOnAction(event -> changeDay(day));
             days.getChildren().add(dayButton);
@@ -174,12 +186,10 @@ public class ForecastDisplay {
         return days;
     }
 
-    private void toggleFavourite(Button favourite) {
+    private void toggleFavourite() {
         if (location.isFavourite()) {
-            favourite.setText("Fav");
             forecasts.removeFavourite(location);
         } else {
-            favourite.setText("UnF");
             forecasts.makeFavourite(location);
         }
     }
