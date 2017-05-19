@@ -15,6 +15,8 @@
  ***************************************************************************/
 package org.bitpipeline.lib.owm;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -597,6 +599,5 @@ public class WeatherData extends AbstractWeatherData {
 		if (hasSnow ())
 			precipitation = precipitation != Integer.MIN_VALUE ? precipitation + getSnow () : getSnow ();
 		return precipitation;
-
 	}
 }

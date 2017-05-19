@@ -22,6 +22,15 @@ public class Location {
 
     private final static String pSep = File.separator;
 
+    public Location(Location location) {
+        this.latitude = location.latitude;
+        this.longitude = location.longitude;
+        this.name = location.name;
+        this.isFavourite = location.isFavourite;
+        this.path = location.path;
+        this.warnings = location.warnings;
+    }
+
     /**
      * Constructor that takes no name parameter
      * and makes a new Location class with these coordinates
@@ -34,7 +43,7 @@ public class Location {
         this.longitude = longitude;
         this.name = latitude + "; " + longitude;
         this.isFavourite = false;
-        this.path = Paths.get("data" + pSep + generateFileName() + ".json");
+        this.path = Paths.get("data" + pSep + hashCode() + ".json");
         this.warnings = new WarningsContainer();
     }
 
@@ -43,7 +52,8 @@ public class Location {
      *
      * @return The file name to use
      */
-    private int generateFileName() {
+    @Override
+    public int hashCode() {
         int result;
         long temp;
         temp = Double.doubleToLongBits(latitude);
@@ -184,26 +194,7 @@ public class Location {
 
         if (latitude != location.latitude) return false;
         if (longitude != location.longitude) return false;
-        return name != null ? name.equals(location.name) : location.name == null;
-    }
-
-    /**
-     * Generates a hash code for the location
-     *
-     * @return The hashcode for th location
-     */
-    @Override
-    public int hashCode() {
-        int result;
-        long temp;
-        temp = Double.doubleToLongBits(latitude);
-        result = (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(longitude);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (isFavourite ? 1 : 0);
-        result = 31 * result + (path != null ? path.hashCode() : 0);
-        return result;
+        return true;
     }
 
     /**

@@ -1,5 +1,6 @@
 package uk.ac.cam.group7.interaction_design.hiking_app;
 
+import jdk.net.SocketFlow;
 import org.bitpipeline.lib.owm.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -132,7 +133,7 @@ public class ForecastContainer {
             } else {
                 currentData = historicData;
             }
-            generateWarnings(historicData, currentData, location);
+            //generateWarnings(historicData, currentData, location);
             weatherDataMap.put(location, currentData);
         }
         recentLocations = importLocations(Paths.get("data" + pSep + "recent.csv"));
@@ -183,6 +184,8 @@ public class ForecastContainer {
         if (!(api == null) && weatherDataMap.get(location).get(0).getDateTime() - System.currentTimeMillis() / 1000 < -1800) {
             weatherDataMap.put(location, getAPIResponse(location.getLatitude(), location.getLongitude(),
                     location.getPath()));
+        } else if (!weatherDataMap.containsKey(location)) {
+            weatherDataMap.put(location, null);
         }
         return weatherDataMap.get(location);
     }
@@ -244,6 +247,11 @@ public class ForecastContainer {
         saveLocations();
     }
 
+    public void renameLocation(Location location, String name) {
+        location.setName(name);
+        saveLocations();
+    }
+
     /**
      * Saves location data
      */
@@ -294,7 +302,7 @@ public class ForecastContainer {
      * @param path The file to read the list of locations from
      * @return The list of locations stored in the provided file
      */
-    private static List<Location> importLocations(Path path) {
+    private List<Location> importLocations(Path path) {
         List<Location> locationsList = new LinkedList<>();
         try {
             BufferedReader r = Files.newBufferedReader(path);
@@ -332,10 +340,13 @@ public class ForecastContainer {
      * @param path      The file to save the locations to
      * @param locations The list of locations to save
      */
-    private static void exportLocations(Path path, List<Location> locations) {
+    private void exportLocations(Path path, List<Location> locations) {
         try {
             BufferedWriter w = Files.newBufferedWriter(path);
             for (Location location : locations) {
+                if (!weatherDataMap.containsKey(location) || weatherDataMap.get(location) == null) {
+                    continue;
+                }
                 StringBuilder line = new StringBuilder();
                 line.append(location.getName());
                 line.append(",");
