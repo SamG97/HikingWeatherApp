@@ -1,5 +1,6 @@
-package uk.ac.cam.group7.interaction_design.hiking_app.alternative_ui;
+package uk.ac.cam.group7.interaction_design.hiking_app.ui;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -10,19 +11,22 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import org.bitpipeline.lib.owm.StatusWeatherData;
-import uk.ac.cam.group7.interaction_design.hiking_app.ForecastContainer;
-import uk.ac.cam.group7.interaction_design.hiking_app.ForecastFormatting;
-import uk.ac.cam.group7.interaction_design.hiking_app.Location;
+import uk.ac.cam.group7.interaction_design.hiking_app.backend.ForecastContainer;
+import uk.ac.cam.group7.interaction_design.hiking_app.backend.ForecastFormatting;
+import uk.ac.cam.group7.interaction_design.hiking_app.backend.Location;
 
 import java.time.DayOfWeek;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles generating the forecast display and passes resulting scene back to MainMenu to be displayed
  *
  * @author Sam Gooch
  */
-public class ForecastDisplay {
+class ForecastDisplay {
 
     private static ForecastContainer forecasts = ForecastContainer.getReference();
 
@@ -38,7 +42,7 @@ public class ForecastDisplay {
      * @param location The location to display the forecast for
      * @param main     Reference back to allow the menu to be drawn
      */
-    protected ForecastDisplay(Location location, MainMenu main) {
+    ForecastDisplay(Location location, MainMenu main) {
         this.location = location;
         this.dailyForecasts = ForecastFormatting.getDailyForecasts(forecasts.getForecast(location));
         this.main = main;
@@ -64,7 +68,7 @@ public class ForecastDisplay {
      *
      * @return The forecast display screen
      */
-    protected Scene getWeatherDisplay() {
+    Scene getWeatherDisplay() {
         VBox display = new VBox();
 
         HBox titleBar = new HBox();
@@ -76,13 +80,15 @@ public class ForecastDisplay {
         ToggleButton favourite = new ToggleButton();
         favourite.setSelected(location.isFavourite());
         titleBar.getChildren().addAll(locationName, home, favourite);
-        titleBar.setHgrow(locationName, Priority.ALWAYS);
+        HBox.setHgrow(locationName, Priority.ALWAYS);
         locationName.setPrefWidth(500);
-        titleBar.setHgrow(home, Priority.ALWAYS);
+        HBox.setHgrow(home, Priority.ALWAYS);
         home.setPrefWidth(100);
-        titleBar.setHgrow(favourite, Priority.ALWAYS);
+        HBox.setHgrow(favourite, Priority.ALWAYS);
         favourite.setPrefWidth(65);
         favourite.setAlignment(Pos.TOP_RIGHT);
+
+        display.getChildren().addAll(titleBar);
 
         if (currentForecastToDisplay == null) {
             Label noData = new Label();
@@ -95,8 +101,25 @@ public class ForecastDisplay {
             helpMessage.setAlignment(Pos.CENTER);
             helpMessage.getStyleClass().set(0, "label-small");
             helpMessage.setWrapText(true);
-            display.getChildren().addAll(titleBar, noData, helpMessage);
+            display.getChildren().addAll(noData, helpMessage);
         } else {
+            if (!(location.getTopWarning() == null)) {
+                HBox warningsContainer = new HBox();
+                ImageView warningIcon = WeatherIconMaker.getWarningIcon(location.getWarningIconCode());
+                warningIcon.setFitWidth(65);
+                warningIcon.setFitHeight(65);
+                Button warningText = new Button();
+                warningText.setText(location.getTopWarning().getDescription());
+                warningText.getStyleClass().set(0, "weather-warning");
+                warningText.setPrefWidth(635);
+                warningText.setAlignment(Pos.CENTER);
+                warningText.setOnAction(event -> acknowledgeWarning());
+                warningsContainer.getChildren().addAll(warningIcon, warningText);
+                warningsContainer.setAlignment(Pos.CENTER);
+                warningsContainer.setPadding(new Insets(0, 0, 0, 10));
+                display.getChildren().addAll(warningsContainer);
+            }
+
             GridPane forecasts = generateForecastScreen();
             ScrollPane scroll = new ScrollPane(forecasts);
             scroll.setFitToHeight(true);
@@ -105,7 +128,7 @@ public class ForecastDisplay {
 
             HBox days = getDayMenu();
 
-            display.getChildren().addAll(titleBar, scroll, days);
+            display.getChildren().addAll(scroll, days);
         }
 
         home.setOnAction(event -> returnHome());
@@ -138,7 +161,7 @@ public class ForecastDisplay {
         windHeader.getStyleClass().set(0, "label-small");
         windHeader.setText("Wind");
         display.add(windHeader, 4, 0);
-        display.setColumnSpan(windHeader, 2);
+        GridPane.setColumnSpan(windHeader, 2);
         Label humidityHeader = new Label();
         humidityHeader.getStyleClass().set(0, "label-small");
         humidityHeader.setText("Humidity");
@@ -152,7 +175,7 @@ public class ForecastDisplay {
             Label temperature = new Label();
             temperature.setText(ForecastFormatting.normaliseTemperature(weather.getTemp()) + "\u00b0" + "C");
             display.add(temperature, 1, row);
-            ImageView type = WeatherIconConverter.getIconImage(weather.getWeatherConditions(), weather.getDateTime());
+            ImageView type = WeatherIconMaker.getIconImage(weather.getWeatherConditions(), weather.getDateTime());
             display.add(type, 2, row);
             Label precipitation = new Label();
             if (weather.getRain() == Integer.MIN_VALUE) {
@@ -173,7 +196,7 @@ public class ForecastDisplay {
             display.add(windData, 4, row);
 
             HBox windDirectionContainer = new HBox();
-            ImageView windDirection = WeatherIconConverter.getWindDirection(weather.getWindDeg());
+            ImageView windDirection = WeatherIconMaker.getWindDirection(weather.getWindDeg());
             windDirectionContainer.getChildren().addAll(windDirection);
             windDirectionContainer.setAlignment(Pos.CENTER);
             display.add(windDirectionContainer, 5, row);
@@ -200,6 +223,14 @@ public class ForecastDisplay {
         display.getColumnConstraints().addAll(timeColumn, temperatureColumn, typeColumn, precipitationColumn,
                 windColumn, windDirectionColumn, humidityColumn);
         return display;
+    }
+
+    /**
+     * Acknowledges a warning so that it is not shown again
+     */
+    private void acknowledgeWarning() {
+        forecasts.acknowledgeWarning(location);
+        main.drawScreen(getWeatherDisplay());
     }
 
     /**
@@ -238,7 +269,7 @@ public class ForecastDisplay {
         }
 
         for (Node node : days.getChildren()) {
-            days.setHgrow(node, Priority.ALWAYS);
+            HBox.setHgrow(node, Priority.ALWAYS);
         }
 
         return days;

@@ -1,4 +1,4 @@
-package uk.ac.cam.group7.interaction_design.hiking_app;
+package uk.ac.cam.group7.interaction_design.hiking_app.backend;
 
 import org.bitpipeline.lib.owm.WeatherData;
 
@@ -18,7 +18,7 @@ public class Warning {
      * @param type        The type of weather the warning concerns
      * @param description A description of the weather warning
      */
-    public Warning(WeatherData.WeatherCondition.ConditionCode type, String description) {
+    Warning(WeatherData.WeatherCondition.ConditionCode type, String description) {
         this.type = type;
         this.description = description;
     }
@@ -28,7 +28,7 @@ public class Warning {
      *
      * @return The weather condition that the warning concerns
      */
-    public WeatherData.WeatherCondition.ConditionCode getWarningType() {
+    WeatherData.WeatherCondition.ConditionCode getWarningType() {
         return type;
     }
 

@@ -13,8 +13,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
-import uk.ac.cam.group7.interaction_design.hiking_app.ForecastContainer;
-import uk.ac.cam.group7.interaction_design.hiking_app.Location;
+import uk.ac.cam.group7.interaction_design.hiking_app.backend.ForecastContainer;
+import uk.ac.cam.group7.interaction_design.hiking_app.backend.Location;
 
 /**
  * This is the main screen that will have search menus etc

@@ -1,4 +1,4 @@
-package uk.ac.cam.group7.interaction_design.hiking_app;
+package uk.ac.cam.group7.interaction_design.hiking_app.backend;
 
 import org.bitpipeline.lib.owm.StatusWeatherData;
 import org.bitpipeline.lib.owm.WeatherStatusResponse;
@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Dávid, Sam Gooch
  */
-public class JsonIO {
+class JsonIO {
 
     /**
      * Reads a JSON file in from disk
@@ -23,7 +23,7 @@ public class JsonIO {
      * @param path The path to the file on disk
      * @return List<StatusWeatherData> The forecast stored in the file
      */
-    protected static List<StatusWeatherData> readJson(Path path) {
+    static List<StatusWeatherData> readJson(Path path) {
         String read;
         JSONObject json = new JSONObject();
         try {
@@ -35,7 +35,7 @@ public class JsonIO {
                 fileSize = 8 * 1024;
             StringWriter strWriter = new StringWriter(fileSize);
             char[] buffer = new char[8 * 1024];
-            int n = 0;
+            int n;
             while ((n = isReader.read(buffer)) != -1) {
                 strWriter.write(buffer, 0, n);
             }
@@ -55,8 +55,7 @@ public class JsonIO {
      * @param path The path to the file on disk to write to
      * @param data The JSON file to save
      */
-    protected static void saveJson(Path path, JSONObject data) {
-        ObjectOutputStream outputStream;
+    static void saveJson(Path path, JSONObject data) {
         try {
             BufferedWriter w = Files.newBufferedWriter(path);
             w.write(data.toString());

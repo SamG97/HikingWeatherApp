@@ -1,4 +1,4 @@
-package uk.ac.cam.group7.interaction_design.hiking_app.alternative_ui;
+package uk.ac.cam.group7.interaction_design.hiking_app.ui;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,8 +10,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import uk.ac.cam.group7.interaction_design.hiking_app.ForecastContainer;
-import uk.ac.cam.group7.interaction_design.hiking_app.Location;
+import uk.ac.cam.group7.interaction_design.hiking_app.backend.ForecastContainer;
+import uk.ac.cam.group7.interaction_design.hiking_app.backend.Location;
 
 /**
  * Handles generating the options menu and passes resulting scene back to MainMenu to be displayed
@@ -42,7 +42,7 @@ public class OptionsMenu {
      *
      * @return The options menu scene
      */
-    protected Scene generateOptionsMenu() {
+    Scene generateOptionsMenu() {
         BorderPane border = new BorderPane();
 
         VBox container = new VBox();
@@ -57,11 +57,11 @@ public class OptionsMenu {
         favourite.setSelected(location.isFavourite());
         topBar.getChildren().addAll(locationName, home, favourite);
 
-        topBar.setHgrow(locationName, Priority.ALWAYS);
+        HBox.setHgrow(locationName, Priority.ALWAYS);
         locationName.setPrefWidth(500);
-        topBar.setHgrow(home, Priority.ALWAYS);
+        HBox.setHgrow(home, Priority.ALWAYS);
         home.setPrefWidth(100);
-        topBar.setHgrow(favourite, Priority.ALWAYS);
+        HBox.setHgrow(favourite, Priority.ALWAYS);
         favourite.setPrefWidth(65);
 
         HBox coordinatesBar = new HBox();
@@ -76,8 +76,8 @@ public class OptionsMenu {
         coordinatesBar.getChildren().addAll(latitude, longitude);
         coordinatesBar.setAlignment(Pos.CENTER);
 
-        coordinatesBar.setHgrow(latitude, Priority.ALWAYS);
-        coordinatesBar.setHgrow(longitude, Priority.ALWAYS);
+        HBox.setHgrow(latitude, Priority.ALWAYS);
+        HBox.setHgrow(longitude, Priority.ALWAYS);
 
         Button delete = new Button();
         delete.setText("Delete location");
@@ -107,8 +107,8 @@ public class OptionsMenu {
         no.getStyleClass().add("warning-button");
         confirmContainer.getChildren().addAll(yes, no);
 
-        confirmContainer.setHgrow(yes, Priority.ALWAYS);
-        confirmContainer.setHgrow(no, Priority.ALWAYS);
+        HBox.setHgrow(yes, Priority.ALWAYS);
+        HBox.setHgrow(no, Priority.ALWAYS);
 
         deletePrompt.getChildren().addAll(confirmPrompt1, confirmPrompt2, confirmPrompt3, confirmContainer);
         deletePrompt.setAlignment(Pos.CENTER);

@@ -1,4 +1,4 @@
-package uk.ac.cam.group7.interaction_design.hiking_app.alternative_ui;
+package uk.ac.cam.group7.interaction_design.hiking_app.ui;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -9,15 +9,16 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class WeatherIconConverter {
+class WeatherIconMaker {
 
     /**
      * Get a weather condition icon to display from a list of conditions
+     *
      * @param allConditions List of conditions in a forecast
-     * @param timeStamp Timestamp of forecast
+     * @param timeStamp     Timestamp of forecast
      * @return Icon to display
      */
-    protected static ImageView getIconImage(List<WeatherCondition> allConditions, long timeStamp) {
+    static ImageView getIconImage(List<WeatherCondition> allConditions, long timeStamp) {
         List<WeatherCondition.ConditionCode> allConditionCodes = new LinkedList<>();
         for (WeatherCondition condition : allConditions) {
             allConditionCodes.add(condition.getCode());
@@ -132,11 +133,28 @@ public class WeatherIconConverter {
     }
 
     /**
+     * Get weather warning icon
+     *
+     * @param severity Severity of the weather warning
+     * @return Weather warning icon
+     */
+    static ImageView getWarningIcon(int severity) {
+        try {
+            FileInputStream storedImage = new FileInputStream("src/img/Warning" + severity + ".png");
+            Image icon = new Image(storedImage);
+            return new ImageView(icon);
+        } catch (IOException e) {
+            throw new RuntimeException("File system improperly configured");
+        }
+    }
+
+    /**
      * Get wind direction icon
+     *
      * @param direction Wind direction (degrees CW from North)
      * @return Wind direction icon
      */
-    protected static ImageView getWindDirection(int direction) {
+    static ImageView getWindDirection(int direction) {
         try {
             FileInputStream baseArrow = new FileInputStream("src/img/WindDirection.png");
             Image icon = new Image(baseArrow);
@@ -151,6 +169,7 @@ public class WeatherIconConverter {
 
     /**
      * Returns if time stamp corresponds to day or night time
+     *
      * @param timeStamp Time stamp
      * @return true if day; false if night
      */

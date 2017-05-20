@@ -1,4 +1,4 @@
-package uk.ac.cam.group7.interaction_design.hiking_app;
+package uk.ac.cam.group7.interaction_design.hiking_app.backend;
 
 import org.bitpipeline.lib.owm.StatusWeatherData;
 
@@ -36,6 +36,9 @@ public class ForecastFormatting {
         long currentDay = (System.currentTimeMillis() / 1000) / 86400;
         int today = getToady().getValue();
         for (StatusWeatherData forecast : allForecasts) {
+            if (forecast.getDateTime() - (System.currentTimeMillis() / 1000) < -10800) {
+                continue;
+            }
             long forecastDay = forecast.getDateTime() / 86400;
             int forecastDayValue = today;
             while (forecastDay > currentDay) {

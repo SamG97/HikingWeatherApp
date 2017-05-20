@@ -1,14 +1,7 @@
-package uk.ac.cam.group7.interaction_design.hiking_app;
+package uk.ac.cam.group7.interaction_design.hiking_app.unused;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
 import javax.swing.JButton;
 
 /**

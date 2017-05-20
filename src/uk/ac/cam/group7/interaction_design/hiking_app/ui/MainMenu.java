@@ -1,4 +1,4 @@
-package uk.ac.cam.group7.interaction_design.hiking_app.alternative_ui;
+package uk.ac.cam.group7.interaction_design.hiking_app.ui;
 
 import javafx.application.Application;
 import javafx.geometry.HPos;
@@ -13,9 +13,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import uk.ac.cam.group7.interaction_design.hiking_app.ForecastContainer;
-import uk.ac.cam.group7.interaction_design.hiking_app.ForecastFormatting;
-import uk.ac.cam.group7.interaction_design.hiking_app.Location;
+import uk.ac.cam.group7.interaction_design.hiking_app.backend.ForecastContainer;
+import uk.ac.cam.group7.interaction_design.hiking_app.backend.ForecastFormatting;
+import uk.ac.cam.group7.interaction_design.hiking_app.backend.Location;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,8 +28,8 @@ import java.util.List;
  */
 public class MainMenu extends Application {
 
-    private Stage window;
     private static ForecastContainer forecasts = ForecastContainer.getReference();
+    private Stage window;
 
     /**
      * Main function for the 'app'; starts everything
@@ -57,7 +57,7 @@ public class MainMenu extends Application {
     /**
      * Allows other scenes to easily return to the home menu
      */
-    protected void returnHome() {
+    void returnHome() {
         drawScreen(generateMainMenu());
     }
 
@@ -66,7 +66,7 @@ public class MainMenu extends Application {
      *
      * @param scene Scene to draw
      */
-    protected void drawScreen(Scene scene) {
+    void drawScreen(Scene scene) {
         scene.getStylesheets().add("style.css");
         window.setScene(scene);
         window.setHeight(900);
@@ -93,9 +93,9 @@ public class MainMenu extends Application {
         confirm.setPrefWidth(100);
 
         searchBar.getChildren().addAll(latitude, longitude, confirm);
-        searchBar.setHgrow(latitude, Priority.ALWAYS);
-        searchBar.setHgrow(longitude, Priority.ALWAYS);
-        searchBar.setHgrow(confirm, Priority.ALWAYS);
+        HBox.setHgrow(latitude, Priority.ALWAYS);
+        HBox.setHgrow(longitude, Priority.ALWAYS);
+        HBox.setHgrow(confirm, Priority.ALWAYS);
 
         Label invalidCoordinates = new Label();
         invalidCoordinates.setStyle("-fx-font-size: 3em;");
@@ -212,27 +212,36 @@ public class MainMenu extends Application {
                 row++;
                 continue;
             }
+            if (!(location.getTopWarning() == null)) {
+                ImageView warningIcon = WeatherIconMaker.getWarningIcon(location.getWarningIconCode());
+                warningIcon.setFitWidth(50);
+                warningIcon.setFitHeight(50);
+                GridPane.setConstraints(warningIcon, 2, row, 1, 1, HPos.RIGHT, VPos.CENTER);
+                display.add(warningIcon, 2, row);
+            }
             Label temperature = new Label(ForecastFormatting.normaliseTemperature(
                     forecasts.getForecast(location).get(0).getTemp()) + "\u00b0" + "C");
             temperature.setTextAlignment(TextAlignment.RIGHT);
-            display.setConstraints(temperature, 2, row, 1, 1, HPos.RIGHT, VPos.CENTER);
-            display.add(temperature, 2, row);
-            ImageView type = WeatherIconConverter.getIconImage(
+            GridPane.setConstraints(temperature, 3, row, 1, 1, HPos.RIGHT, VPos.CENTER);
+            display.add(temperature, 3, row);
+            ImageView type = WeatherIconMaker.getIconImage(
                     forecasts.getForecast(location).get(0).getWeatherConditions(),
                     forecasts.getForecast(location).get(0).getDateTime());
-            display.setConstraints(type, 3, row, 1, 1, HPos.RIGHT, VPos.CENTER);
-            display.add(type, 3, row);
+            GridPane.setConstraints(type, 4, row, 1, 1, HPos.RIGHT, VPos.CENTER);
+            display.add(type, 4, row);
             row++;
         }
         ColumnConstraints optionsColumn = new ColumnConstraints(65, 65, 65);
         optionsColumn.setHgrow(Priority.ALWAYS);
         ColumnConstraints nameColumn = new ColumnConstraints(20, 600, 700);
         nameColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints temperatureColumn = new ColumnConstraints(150, 150, 500);
+        ColumnConstraints warningColumn = new ColumnConstraints(65, 65, 65);
+        warningColumn.setHgrow(Priority.ALWAYS);
+        ColumnConstraints temperatureColumn = new ColumnConstraints(120, 120, 120);
         temperatureColumn.setHgrow(Priority.ALWAYS);
-        ColumnConstraints conditionsColumn = new ColumnConstraints(150, 150, 500);
+        ColumnConstraints conditionsColumn = new ColumnConstraints(150, 150, 150);
         conditionsColumn.setHgrow(Priority.ALWAYS);
-        display.getColumnConstraints().addAll(optionsColumn, nameColumn, temperatureColumn, conditionsColumn);
+        display.getColumnConstraints().addAll(optionsColumn, nameColumn, warningColumn, temperatureColumn, conditionsColumn);
         return display;
     }
 
