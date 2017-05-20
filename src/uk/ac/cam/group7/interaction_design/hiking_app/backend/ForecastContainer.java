@@ -370,15 +370,15 @@ public class ForecastContainer {
         for (int newIndex = 0; newIndex < oldForecast.size(); oldIndex++, newIndex++) {
             if (oldForecast.get(oldIndex).getTemp() - newForecast.get(newIndex).getTemp() > 7) {
                 location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.COLD,
-                        "The forecast is colder than previously forecast"), 0);
+                        "Colder than previously forecast"), 0);
             }
             if (oldForecast.get(oldIndex).getTemp() - newForecast.get(newIndex).getTemp() < -7) {
                 location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.HOT,
-                        "The forecast is colder than previously forecast"), 0);
+                        "Hotter than previously forecast"), 0);
             }
             if (newForecast.get(newIndex).getWind().getSpeed() - oldForecast.get(oldIndex).getWind().getSpeed() > 10) {
                 location.addWarning(new Warning(WeatherData.WeatherCondition.ConditionCode.WINDY,
-                        "The forecast is windier than previously forecast"), 0);
+                        "Windier than previously forecast"), 0);
             }
             List<WeatherData.WeatherCondition.ConditionCode> forecastConditionGroup = new LinkedList<>();
             for (List<WeatherData.WeatherCondition.ConditionCode> group : WeatherGroupings.getGroups()) {
@@ -403,7 +403,7 @@ public class ForecastContainer {
                 if (correctGroup < oldForecast.get(oldIndex).getWeatherConditions().size() / 2) {
                     if (!(forecastConditionGroup.get(0) == WeatherData.WeatherCondition.ConditionCode.UNKNOWN)) {
                         location.addWarning(new Warning(forecastConditionGroup.get(0),
-                                        "The forecast conditions are different to those previously forecast"),
+                                        "Weather conditions have changed"),
                                 0);
                     }
                 }
