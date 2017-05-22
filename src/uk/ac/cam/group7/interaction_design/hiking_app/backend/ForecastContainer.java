@@ -411,8 +411,7 @@ public class ForecastContainer {
         }
 
         // Randomly generates more serious weather warning for now as a test since a suitable API could not be found
-        Random rnd = new Random();
-        rnd.setSeed(location.hashCode());
+        Random rnd = new Random(location.hashCode());
         if (rnd.nextInt(100) <= 5) {
             int severity = rnd.nextInt(100);
             if (severity > 95) {
